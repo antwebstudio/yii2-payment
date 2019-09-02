@@ -6,7 +6,7 @@ use yii\helpers\Url;
 use yii\helpers\Console;
 use yii\helpers\Html;
 use console\components\Controller;
-use common\modules\order\models\Order;
+use common\modules\payment\models\Order;
 use common\modules\payment\models\Invoice;
 
 class PaymentController extends Controller
@@ -33,10 +33,10 @@ class PaymentController extends Controller
 	
 	public function actionRequery($ref = null) {
 		if (isset($ref)) {
-			$order = \common\modules\order\models\Order::findOne($ref);
+			$order = Order::findOne($ref);
 			$orders = [$order];
 		} else {
-			$orders = \common\modules\order\models\Order::find()->orderBy('created_at DESC')->where(['status' => Order::STATUS_ACTIVE])->limit(50)->all();
+			$orders = Order::find()->orderBy('created_at DESC')->where(['status' => Order::STATUS_ACTIVE])->limit(50)->all();
 		}
 		
 		if (isset($orders)) {

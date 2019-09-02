@@ -13,7 +13,7 @@ use common\modules\payment\models\Billable;
 use common\modules\payment\models\PayableItem;
 use common\modules\payment\models\PayableCallBack;
 
-use common\modules\order\models\Order;
+use common\modules\payment\models\Order;
 use common\modules\payment\components\PayPalExpressGateway;
 use common\modules\payment\components\IPay88Gateway;
 use common\modules\payment\models\Invoice;

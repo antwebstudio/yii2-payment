@@ -1,3 +1,6 @@
+<?php 
+if (YII_DEBUG) throw new \Exception('DEPRECATED');
+?>
 <div>
 	<p>This invoice is already paid!</p>
 </div>

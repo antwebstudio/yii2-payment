@@ -6,7 +6,7 @@ use Yii;
 use yii\web\Controller;
 use common\modules\payment\models\Invoice;
 use common\modules\payment\models\InvoiceSearch;
-use common\modules\order\models\Order;
+use common\modules\payment\models\Order;
 
 
 /**

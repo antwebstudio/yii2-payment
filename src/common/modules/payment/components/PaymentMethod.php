@@ -104,11 +104,9 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 	}
 	
 	public function getPaymentUrl($type, $payId) {
-		if (YII_DEBUG) throw new \Exception('Should change cancel url to payment controller. ');
-		
 		return Url::to(['/payment/default/pay', 
 			'payId' => $payId, 
-			'cancelUrl' => '/order/default/payment', 
+			'cancelUrl' => \Yii::$app->payment->getCancelUrl(), 
 			'type' => $type,
 			'payMethod' => $this->name,
 		]);

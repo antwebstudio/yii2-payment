@@ -368,8 +368,7 @@ class Invoice extends ActiveRecord implements Payable
 		if (isset($this->issue_to) && $this->issue_to) {
 			return $this->hasOne(\common\modules\contact\models\Contact::className(), ['id' => 'billed_to']);
 		} else if (isset($this->order)) {
-			if (YII_DEBUG) throw new \Exception('DEPRECATED');
-			return $this->order->billedTo;				
+			if (!YII_DEBUG) return $this->order->billedTo;				
 		}
 		return $this->hasOne(\common\modules\contact\models\Contact::className(), ['id' => 'billed_to']);
 	}

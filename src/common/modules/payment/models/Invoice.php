@@ -104,7 +104,8 @@ class Invoice extends ActiveRecord implements Payable
     {
         return
 		[
-			[['total_amount'/*, 'issue_to'*/], 'required'],
+			//[['total_amount'/*, 'issue_to'*/], 'required'],
+			[['total_amount'], 'default', 'value' => 0],
             [['total_amount', 'paid_amount'], 'number'],
             [['issue_to', 'issue_by', 'status'], 'integer'],
             [['due_date', 'issue_date', 'created_at', 'updated_at'], 'safe'],

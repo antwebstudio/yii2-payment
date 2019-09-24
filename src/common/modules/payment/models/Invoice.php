@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 
 use common\helpers\Currency;
 use common\modules\payment\models\Payable;
-use common\modules\payment\models\BillableItem;
+use ant\payment\interfaces\BillableItem;
 use common\modules\order\models\Order;
 use common\modules\user\models\User;
 use common\modules\contact\models\Contact;
@@ -114,6 +114,14 @@ class Invoice extends ActiveRecord implements Payable
             [['formatted_id'], 'unique'],
         ];
 	}
+
+    public function fields()
+    {
+        return \yii\helpers\ArrayHelper::merge(parent::fields(), [
+			'subtotal',
+			'netTotal',
+		]);
+    }
 
 	public static function encodeId($id) {
 		$hashid = new \Hashids\Hashids('InvoiceHashId', 4, 'abcdefghijklmnopqrstuvwxyz');

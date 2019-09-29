@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\payment\migrations\db;
+namespace ant\payment\migrations\db;
 
 use yii\db\Migration;
 

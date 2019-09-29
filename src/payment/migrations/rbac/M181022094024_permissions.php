@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\payment\migrations\rbac;
+namespace ant\payment\migrations\rbac;
 
 use yii\db\Schema;
 use common\rbac\Migration;
@@ -12,15 +12,15 @@ class M181022094024_permissions extends Migration
 	
 	public function init() {
 		$this->permissions = [
-			\frontend\modules\payment\controllers\BankWireController::className() => [
+			\ant\payment\controllers\BankWireController::className() => [
 				'index' => ['View own bank-wire payment history', [Role::ROLE_USER]],
 				'create' => ['Submit bank wire payment', [Role::ROLE_USER]],
 			],
-			\frontend\modules\payment\controllers\DefaultController::className() => [
+			\ant\payment\controllers\DefaultController::className() => [
 				'pay' => ['Make payment', [Role::ROLE_GUEST]],
 				'complete-payment' => ['Complete payment made', [Role::ROLE_GUEST]],
 			],
-			\frontend\modules\payment\controllers\InvoiceController::className() => [
+			\ant\payment\controllers\InvoiceController::className() => [
 				'view-by-link' => ['View invoice by private link', [Role::ROLE_GUEST]],
 			],
 			\backend\modules\payment\controllers\DefaultController::className() => [

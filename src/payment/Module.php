@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\modules\payment;
+namespace ant\payment;
 
 use common\modules\payment\models\Payable;
 
@@ -10,6 +10,8 @@ use common\modules\payment\models\Payable;
 class Module extends \common\modules\payment\Module
 {
 	const SESSION_PAYMENT_SUCCESS_URL = 'paymentSuccessUrl';
+	
+	public $invoiceNumberFormat = '#{id:5}';
 	
 	public $sandbox = false;
 	public $paymentGateway;
@@ -21,10 +23,21 @@ class Module extends \common\modules\payment\Module
 	public $paymentPageUrl;
 	public $successUrl = '/order/default/success';
 	public $deductQuantity = true;
-    /**
-     * @inheritdoc
-     */
-    public $controllerNamespace = 'frontend\modules\payment\controllers';
+	
+	public function behaviors() {
+		return [
+			[
+				'class' => \common\behaviors\ConfigurableModuleBehavior::className(),
+				'formModels' => [
+					'bankWire' => ['class' => \common\modules\payment\models\BankWireForm::className()],
+					/*'on '.\common\base\FormModel::EVENT_AFTER_SAVE => function($event) {
+						$formModel = $event->sender;
+						$formModel->sendNotificationEmailToAdmin();
+					}*/
+				],
+			],
+		];
+	}
 
     /**
      * @inheritdoc

@@ -1,12 +1,6 @@
 <?php
 namespace common\modules\payment\components;
 
-interface PaymentMethodInterface
+interface PaymentMethodInterface extends \ant\payment\components\PaymentMethodInterface
 {
-	public function initGateway();
-	
-	public function getPaymentRecordData();
-	
-	public function getPurchaseRequestAmountParamName();
 }
-?>

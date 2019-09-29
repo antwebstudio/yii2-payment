@@ -1,5 +1,5 @@
 <?php
-namespace frontend\modules\payment\controllers;
+namespace ant\payment\controllers;
 
 use Yii;
 use yii\web\Controller;

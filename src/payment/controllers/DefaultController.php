@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\modules\payment\controllers;
+namespace ant\payment\controllers;
 
 use Yii;
 use yii\web\Controller;
@@ -37,6 +37,8 @@ class DefaultController extends Controller
 
     public function actionPay($payId, $type = false, $payMethod = false, $cancelUrl = '')
     {
+		if (!isset(\Yii::$app->payment)) throw new \Exception('Payment component is not setup. Please setup using ant\payment\components\PaymentComponent.');		
+		
 		$payableModel = $this->getPayableModel($type, $payId);
 		
 		if ($payableModel instanceof \common\interfaces\Expirable && $payableModel->isExpired) throw new \Exception('The payable is expired. ');

@@ -1,5 +1,5 @@
 <?php
-namespace common\modules\payment\console\controllers;
+namespace ant\payment\console\controllers;
 
 use Yii;
 use yii\helpers\Url;

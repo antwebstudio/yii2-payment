@@ -229,6 +229,16 @@ class Invoice extends ActiveRecord implements Payable
 	public function getRoute() {
 		return ['/payment/invoice/view', 'id' => $this->id];
 	}
+	
+	public function getPayRoute($paymentMethod, $cancelUrl = null) {
+		return [
+			'/payment/default/pay', 
+			'payMethod' => $paymentMethod, 
+			'payId' => $this->id, 
+			'cancelUrl' => isset($cancelUrl) ? Url::to($cancelUrl) : null, 
+			'type' => 'invoice'
+		];
+	}
 
 	public function getReference()
 	{

@@ -40,7 +40,7 @@ class Payment extends \yii\db\ActiveRecord
     const EVENT_UNAPPROVED = 'event_unapproved';
 
 	public function behaviors() {
-		return [
+		$behaviors = [
 			BlameableBehavior::className() => [
 				'class' => BlameableBehavior::className(),
 				'createdByAttribute' => 'paid_by',
@@ -58,13 +58,17 @@ class Payment extends \yii\db\ActiveRecord
                 'class' => \common\behaviors\AttachBehaviorBehavior::className(),
                 'config' => '@common/config/behaviors.php',
             ],
-            [
-                'class' => \common\modules\file\behaviors\AttachmentBehavior::className(),
-                'attribute' => 'attachments',
-                'modelType' => \common\modules\payment\models\Payment::className(),
-                'multiple' => true,
-            ],
 		];
+		
+		if (Yii::$app->getModule('file') != null) {
+			$behaviors[] = [
+				'class' => \common\modules\file\behaviors\AttachmentBehavior::className(),
+				'attribute' => 'attachments',
+				'modelType' => \common\modules\payment\models\Payment::className(),
+				'multiple' => true,
+			];
+		}
+		return $behaviors;
 	}
     /**
      * @inheritdoc

@@ -21,6 +21,7 @@ class M181022094024_permissions extends Migration
 				'complete-payment' => ['Complete payment made', [Role::ROLE_GUEST]],
 			],
 			\ant\payment\controllers\InvoiceController::className() => [
+				'index' => ['View my invoices', [Role::ROLE_USER]],
 				'view-by-link' => ['View invoice by private link', [Role::ROLE_GUEST]],
 			],
 			\backend\modules\payment\controllers\DefaultController::className() => [

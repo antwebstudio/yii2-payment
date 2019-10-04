@@ -7,14 +7,16 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\HttpException;
 
-use common\modules\payment\models\Payable;
-use common\modules\payment\models\PayableItem;
-use common\modules\payment\models\PayableCallBack;
+use ant\payment\models\Payable;
+use ant\payment\models\PayableItem;
+use ant\payment\models\PayableCallBack;
 
-use common\modules\payment\models\Order;
-use common\modules\payment\components\PayPalExpressGateway;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceItem;
+use ant\payment\models\Order;
+use ant\payment\components\PayPalExpressGateway;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceItem;
+use ant\payment\models\InvoiceSearch;
+use ant\organization\models\Organization;
 
 class InvoiceController extends \yii\web\Controller {
     /**
@@ -23,7 +25,17 @@ class InvoiceController extends \yii\web\Controller {
      */
     public function actionIndex()
     {
-        return $this->render('index');
+		$organization = Organization::find()->haveCollaborator(Yii::$app->user->id)->one();
+		$model = new InvoiceSearch;
+		$dataProvider = $model->search(Yii::$app->request->queryParams);
+		$dataProvider->sort = ['defaultOrder' => ['issue_date'=>SORT_DESC]];
+		$dataProvider->query->andWhere([
+			'organization_id' => $organization->id,
+		]);
+		
+        return $this->render($this->action->id, [
+			'dataProvider' => $dataProvider,
+		]);
     }
 
     public function actionViewByLink($privateSlug) {

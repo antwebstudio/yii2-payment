@@ -122,7 +122,7 @@ class DefaultController extends Controller
 
 			// Customer Cancel Transaction will also come to this action, hence should not throw exception.
 		}
-		return $this->render('payment-error', ['response' => $response, 'url' => \yii\helpers\Url::to($this->module->getPaymentPageUrl($payableModel))]);
+		return $this->render('payment-error', ['response' => $response, 'url' => $this->module->getPaymentErrorUrl($payableModel)]);
 		
 		//throw new \yii\web\HttpException(500, $response->getMessage());
     }

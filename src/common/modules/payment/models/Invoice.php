@@ -12,6 +12,8 @@ use ant\payment\interfaces\BillableItem;
 use common\modules\order\models\Order;
 use common\modules\user\models\User;
 use common\modules\contact\models\Contact;
+use common\modules\organization\models\Organization;
+
 /**
  * This is the model class for table "{{%payment_invoice}}".
  *
@@ -403,6 +405,8 @@ class Invoice extends ActiveRecord implements Payable
 	public static function createFromBillableItem(BillableItem $billableItem, $billTo = null) {
 		$userId = $billTo instanceof User ? $billTo->id : null;
 		$contactId = $billTo instanceof Contact ? $billTo->id : null;
+		$contactId = $billTo instanceof Organization ? $billTo->contact_id : $contactId;
+		$organizationId = $billTo instanceof Organization ? $billTo->id : null;
 
 		$invoice = new Invoice([
 			'total_amount' => $billableItem->getUnitPrice(),
@@ -412,6 +416,7 @@ class Invoice extends ActiveRecord implements Payable
 			'paid_amount' => 0,
 			'issue_to' => $userId,
 			'billed_to' => $contactId,
+			'organization_id' => $organizationId,
 			'remark' => 'not set',
 			'status' => Invoice::STATUS_ACTIVE,
 		]);
@@ -517,13 +522,23 @@ class Invoice extends ActiveRecord implements Payable
 		return [
 			self::STATUS_ACTIVE => [
 				'label' => 'Active',
-				'cssClass' => 'label-warning',
+				'cssClass' => 'badge-warning badge label-warning',
 			],
 			self::STATUS_PAID => [
 				'label' => 'Paid',
-				'cssClass' => 'label-success',
+				'cssClass' => 'badge-success badge label-success',
 			],
 		];
+	}
+	
+	public function getStatusHtml() {
+		$options = self::statusOptions();
+		
+		if (isset($options[$this->status])) {
+			return '<span class="'.$options[$this->status]['cssClass'].'">'.$options[$this->status]['label'].'</span>';
+		} else {
+			return '<span class="badge badge-light">Unknown</span>';
+		}
 	}
 
 	public function getStatusOption($option = null, $default = null) {

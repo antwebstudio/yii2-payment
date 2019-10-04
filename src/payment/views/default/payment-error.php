@@ -1,21 +1,9 @@
 <?php
-use yii\bootstrap\Alert;
+use yii\helpers\Url;
 
 ?>
-
-<div class="container">
-
-<?php Alert::begin([
-	'closeButton' => false,
-    'options' => [
-        'class' => 'alert-danger',
-    ],
-]) ?>
-
+<div class="alert-danger alert">
 	Payment Error: <?= $response->getMessage() ?>
-
-<?php Alert::end() ?>
-
-<a class="btn btn-primary" href="<?= $url ?>">Back</a>
-
 </div>
+
+<a class="btn btn-primary" href="<?= Url::to($url) ?>">Back</a>

@@ -5,8 +5,15 @@ use common\modules\payment\components\PaymentMethod;
 
 class PayPalPaymentMethod extends PaymentMethod
 {
-	public function initGateway() {
-        $this->_gateway = \Omnipay\Omnipay::create('PayPal_Express');
+	public $gatewayType;
+	
+	public function initGateway($config = []) {
+		$gatewayType = isset($config['gatewayType']) ? $config['gatewayType'] : 'PayPal_Express';
+        $this->_gateway = \Omnipay\Omnipay::create($gatewayType);
+	}
+	
+	public function createCard($options) {
+		return $this->_gateway->createCard($options);
 	}
 	
 	/*
@@ -48,18 +55,34 @@ class PayPalPaymentMethod extends PaymentMethod
 		
 		$data = $this->_response->getData();
 		
-		return [
-		//	'transaction_id' => 
-			'amount' => $data['PAYMENTINFO_0_AMT'],
-			//'ref_no' => $data['RefNo'],
-			'currency' => $data['PAYMENTINFO_0_CURRENCYCODE'],
-			'status' => $data['PAYMENTINFO_0_ERRORCODE'] == '0' ? self::STATUS_SUCCESS : self::STATUS_ERROR,
-			//'signature' => $data['Signature'],
-			//'remark' => $data['Remark'],
-			'merchant_code' => $data['PAYMENTINFO_0_SECUREMERCHANTACCOUNTID'],
-			'error' => isset($data['L_LONGMESSAGE0']) ? $data['L_LONGMESSAGE0'] : '',
-			'data' => is_array($data) ? json_encode($data) : $data,
-		];
+		if (isset($data['L_ERRORCODE0']) && $data['L_ERRORCODE0'] == '10002') {
+			// Invalid credential
+			throw new \Exception('Invalid credential. '.print_r($data,1));
+		} else {
+			throw new \Exception('Invalid credential. '.print_r($data,1));
+			return [
+			//	'transaction_id' => 
+				'amount' => $data['PAYMENTINFO_0_AMT'],
+				//'ref_no' => $data['RefNo'],
+				'currency' => $data['PAYMENTINFO_0_CURRENCYCODE'],
+				'status' => $data['PAYMENTINFO_0_ERRORCODE'] == '0' ? self::STATUS_SUCCESS : self::STATUS_ERROR,
+				//'signature' => $data['Signature'],
+				//'remark' => $data['Remark'],
+				'merchant_code' => $data['PAYMENTINFO_0_SECUREMERCHANTACCOUNTID'],
+				'error' => isset($data['L_LONGMESSAGE0']) ? $data['L_LONGMESSAGE0'] : '',
+				'data' => is_array($data) ? json_encode($data) : $data,
+			];
+		}
+	}
+	
+    public function setClientId($clientId)
+    {
+		$this->_gateway->setClientId($clientId);
+	}
+	
+    public function setSecret($secret)
+    {
+		$this->_gateway->setSecret($secret);
 	}
 	
     public function setUsername($username)

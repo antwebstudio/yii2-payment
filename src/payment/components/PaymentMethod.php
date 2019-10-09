@@ -19,9 +19,10 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 	protected $_response;
 	protected $_buttonOptions = [];
 	
-    public function __construct()
+    public function __construct($config = [])
     {
-		$this->initGateway();
+		$this->initGateway($config);
+		return parent::__construct($config);
     }
 	
 	public function hasOverrideMethod($methodName) {

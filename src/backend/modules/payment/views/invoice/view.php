@@ -22,3 +22,8 @@ use common\modules\user\models\User;
     	]) 
     ?>
 </div>
+
+<?php if (YII_DEBUG): ?>
+	<h2>Debug</h2>
+	<?= \yii\widgets\DetailView::widget(['model' => $model]) ?>
+<?php endif ?>

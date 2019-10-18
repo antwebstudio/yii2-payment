@@ -34,7 +34,7 @@ class DefaultController extends Controller
     }
 
     public function actionView($id){
-        if (YII_DEBUG) throw new \Exception('DEPRECATED');
+        if (YII_DEBUG) throw new \Exception('DEPRECATED, please use InvoiceController instead'); // 2019-10-18
         
     	return $this->redirect('/payment/invoice/view', ['id' => $id]);
     }

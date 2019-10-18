@@ -15,6 +15,7 @@ class M181022094024_permissions extends Migration
 			\ant\payment\controllers\BankWireController::className() => [
 				'index' => ['View own bank-wire payment history', [Role::ROLE_USER]],
 				'create' => ['Submit bank wire payment', [Role::ROLE_USER]],
+				'payment-success' => ['Submit bank wire payment success', [Role::ROLE_USER]],
 			],
 			\ant\payment\controllers\DefaultController::className() => [
 				'pay' => ['Make payment', [Role::ROLE_GUEST]],
@@ -31,6 +32,7 @@ class M181022094024_permissions extends Migration
 			\backend\modules\payment\controllers\InvoiceController::class => [
 				'index' => ['View all invoices', [Role::ROLE_ADMIN]],
 				'view' => ['View invoice detail', [Role::ROLE_ADMIN]],
+				'view-by-link' => ['View invoice detail', [Role::ROLE_ADMIN]],
 				'pay' => ['Pay invoice', [Role::ROLE_ADMIN]],
 				'cancel-pay' => ['Cancel payment for invoice', [Role::ROLE_ADMIN]],
 			],

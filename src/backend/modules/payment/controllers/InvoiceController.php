@@ -70,6 +70,16 @@ class InvoiceController extends Controller
         
     	return $this->render('view', ['model' => $model]);
     }
+
+    public function actionViewByLink($privateSlug){
+        $id = Invoice::decodeId($privateSlug);
+        $model = Invoice::findOne($id);
+
+        return $this->render('view', [
+            'model' => $model,
+            'privateSlug' => $privateSlug,
+        ]);
+    }
 	
 	public function actionIndex($user = null) {
 		$model = new InvoiceSearch;

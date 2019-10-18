@@ -109,7 +109,7 @@ class Invoice extends ActiveRecord implements Payable
 			//[['total_amount'/*, 'issue_to'*/], 'required'],
 			[['total_amount'], 'default', 'value' => 0],
             [['total_amount', 'paid_amount'], 'number'],
-            [['issue_to', 'issue_by', 'status'], 'integer'],
+            [['billed_to', 'issue_to', 'issue_by', 'status'], 'integer'],
             [['due_date', 'issue_date', 'created_at', 'updated_at'], 'safe'],
             [['formatted_id'], 'string', 'max' => 50],
             [['remark'], 'string', 'max' => 255],
@@ -177,6 +177,10 @@ class Invoice extends ActiveRecord implements Payable
             'updated_at' 	=> 'Updated At',
         ];
     }
+	
+	public function getAdminPanelPrivateRoute($params = []) {
+		return $this->getPrivateRoute($params);
+	}
 	
 	public function refund($amount) {
 		return $this->_pay( -$amount);
@@ -406,6 +410,7 @@ class Invoice extends ActiveRecord implements Payable
 		$userId = $billTo instanceof User ? $billTo->id : null;
 		$contactId = $billTo instanceof Contact ? $billTo->id : null;
 		$contactId = $billTo instanceof Organization ? $billTo->contact_id : $contactId;
+		$contactId = $billTo instanceof User ? $billTo->profile->contact_id : $contactId;
 		$organizationId = $billTo instanceof Organization ? $billTo->id : null;
 
 		$invoice = new Invoice([

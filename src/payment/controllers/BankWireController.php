@@ -7,8 +7,9 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\HttpException;
 use yii\data\ActiveDataProvider;
-use common\modules\payment\models\BankWireForm;
-use common\modules\payment\models\Payment;
+use ant\payment\models\Invoice;
+use ant\payment\models\BankWireForm;
+use ant\payment\models\Payment;
 
 /**
  * Default controller for the `payment` module
@@ -27,7 +28,7 @@ class BankWireController extends Controller
         $model = $this->module->getFormModel('bankWire');
 
         if (isset($invoice)) {
-            $invoice = \common\modules\payment\models\Invoice::decodeId($invoice);
+            $invoice = Invoice::decodeId($invoice);
             
             $model->setInvoice($invoice);
             $model->amount = $model->invoice->dueAmount;
@@ -36,11 +37,19 @@ class BankWireController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', $model->paymentSuccessMessage);
-            return $this->redirect(isset($model->redirectUrl) ? $model->redirectUrl : ['/']);
+            return $this->redirect(isset($model->redirectUrl) ? $model->redirectUrl : ['payment-success', 'invoice' => $model->invoice->id]);
         }
 
         return $this->render($this->action->id, [
             'model' => $model,
         ]);
     }
+	
+	public function actionPaymentSuccess($invoice) {
+		$model = Invoice::findOne($invoice);
+
+        return $this->render($this->action->id, [
+            'model' => $model,
+        ]);
+	}
 }

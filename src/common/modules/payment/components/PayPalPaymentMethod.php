@@ -55,11 +55,10 @@ class PayPalPaymentMethod extends PaymentMethod
 		
 		$data = $this->_response->getData();
 		
-		if (isset($data['L_ERRORCODE0']) && $data['L_ERRORCODE0'] == '10002') {
+		if (isset($data['L_ERRORCODE0']) && in_array($data['L_ERRORCODE0'], ['10002', '10406'])) {
 			// Invalid credential
-			throw new \Exception('Invalid credential. '.print_r($data,1));
+			throw new \Exception('('.$data['L_ERRORCODE0'].') '.$data['L_LONGMESSAGE0'].print_r($data,1));
 		} else {
-			throw new \Exception('Invalid credential. '.print_r($data,1));
 			return [
 			//	'transaction_id' => 
 				'amount' => $data['PAYMENTINFO_0_AMT'],

@@ -1,5 +1,5 @@
 <?php
-namespace common\modules\payment\widgets;
+namespace ant\payment\widgets;
 
 use yii\base\Widget;
 use yii\bootstrap\Modal;
@@ -90,8 +90,6 @@ class InvoiceSummary extends Widget{
 	
 	public function init()
 	{
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
         parent::init();
 	}
 

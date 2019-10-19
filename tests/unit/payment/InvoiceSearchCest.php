@@ -1,7 +1,7 @@
 <?php 
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceItem;
-use common\modules\payment\models\InvoiceSearch;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceItem;
+use ant\payment\models\InvoiceSearch;
 
 class InvoiceSearchCest
 {

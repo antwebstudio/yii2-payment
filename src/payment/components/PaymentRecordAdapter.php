@@ -21,7 +21,7 @@ class PaymentRecordAdapter extends \yii\base\BaseObject {
 			'payment_gateway', 'is_valid', 'transaction_id', 'amount', 'currency', 'status', 'error', 'data',
 			'signature', 'ref_no', 'merchant_code', 'remark',
 		];
-		$payment = new \common\modules\payment\models\Payment;
+		$payment = new \ant\payment\models\Payment;
 		
 		foreach ($attributes as $attribute) {
 			$payment->{$attribute} = $this->{$attribute};

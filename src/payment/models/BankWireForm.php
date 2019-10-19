@@ -1,12 +1,12 @@
 <?php
-namespace common\modules\payment\models;
+namespace ant\payment\models;
 
 use yii\helpers\Html;
-use common\helpers\DateTime;
-use common\modules\payment\models\Payment;
-use common\modules\payment\components\PaymentMethod;
+use ant\helpers\DateTime;
+use ant\payment\models\Payment;
+use ant\payment\components\PaymentMethod;
 
-class BankWireForm extends \common\base\FormModel {
+class BankWireForm extends \ant\base\FormModel {
     const SCENARIO_ATTACHMENT_ONLY = 'attachment_only';
 
     public $paymentMethod = 'common\modules\payment\components\BankWirePaymentMethod';

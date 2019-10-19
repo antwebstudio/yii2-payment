@@ -93,7 +93,7 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 	}
 	
 	public function savePaymentRecord($invoice) {
-		$payment = \common\modules\payment\models\Payment::findOne(['transaction_id' => $this->paymentRecord->transaction_id]);
+		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $this->paymentRecord->transaction_id]);
 		
 		if (!isset($payment)) {
 			$payment = $this->paymentRecord;

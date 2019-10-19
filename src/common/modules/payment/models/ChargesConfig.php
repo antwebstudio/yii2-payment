@@ -27,6 +27,10 @@ class ChargesConfig extends \yii\db\ActiveRecord
     {
         return 'em_payment_charges_config';
     }
+	
+	public function init() {
+		if (YII_DEBUG) throw new \Exception('DEPRECATED');
+	}
 
     /**
      * @inheritdoc

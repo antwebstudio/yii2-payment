@@ -1,9 +1,9 @@
 <?php
 //namespace tests\codeception\common\payment;
 //use tests\codeception\common\UnitTester;
-use common\modules\payment\models\Payment;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceItem;
+use ant\payment\models\Payment;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceItem;
 
 class PaymentCest
 {

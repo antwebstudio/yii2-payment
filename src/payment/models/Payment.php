@@ -1,11 +1,11 @@
 <?php
 
-namespace common\modules\payment\models;
+namespace ant\payment\models;
 
 use Yii;
 use yii\behaviors\BlameableBehavior;
-use common\behaviors\TimestampBehavior;
-use common\modules\payment\models\Invoice;
+use ant\behaviors\TimestampBehavior;
+use ant\payment\models\Invoice;
 
 /**
  * This is the model class for table "{{%payment}}".
@@ -40,7 +40,6 @@ class Payment extends \yii\db\ActiveRecord
     const EVENT_UNAPPROVED = 'event_unapproved';
 	
 	public function init() {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
 	}
 
 	public function behaviors() {

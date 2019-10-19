@@ -1,17 +1,7 @@
 <?php
-namespace common\modules\payment\models\query;
+namespace ant\payment\models\query;
 
 class InvoiceQuery extends \common\components\ActiveQuery {
-	
-	public function init() {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		return parent::init();
-	}
-	public function __construct() {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		return parent::__construct();
-	}
-	
 	public function issueToUser($user) {
 		$user = is_object($user) ? $user : \ant\models\models\User::findOne($user);
 		

@@ -4,13 +4,13 @@
 //use Yii;
 //use tests\codeception\common\UnitTester;
 use common\modules\discount\helpers\Discount;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceItem;
-use common\modules\payment\models\Payable;
-use common\modules\payment\models\Billable;
-use common\modules\payment\models\Payment;
-use common\modules\payment\models\PayableItem;
-use common\modules\payment\components\PaymentMethod;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceItem;
+use ant\payment\models\Payable;
+use ant\payment\models\Billable;
+use ant\payment\models\Payment;
+use ant\payment\models\BillableItem;
+use ant\payment\components\PaymentMethod;
 use yii\helpers\Html;
 
 class InvoiceCest
@@ -616,8 +616,8 @@ class InvoiceCestTestModel2 extends InvoiceCestTestModel {
 	}
 }
 
-class InvoiceCestTestModelPayableItem extends \yii\base\Model implements PayableItem {
-	use \common\modules\payment\traits\BillableTrait;
+class InvoiceCestTestModelPayableItem extends \yii\base\Model implements BillableItem {
+	use \ant\payment\traits\BillableTrait;
 	//public $discount;
 	
 	public function getDiscount() {
@@ -671,7 +671,7 @@ class InvoiceCestTestModelPayableItemWithDiscount extends InvoiceCestTestModelPa
 	}
 }
 
-class InvoiceCestTestPaymentMethod extends \common\modules\payment\components\PaymentMethod {
+class InvoiceCestTestPaymentMethod extends PaymentMethod {
 	protected $amount;
 
 	public function initGateway() {
@@ -687,7 +687,7 @@ class InvoiceCestTestPaymentMethod extends \common\modules\payment\components\Pa
 			'amount' => $this->amount,
 			'ref_no' => '1',
 			'currency' => 'MYR',
-			'status' => \common\modules\payment\components\PaymentMethod::STATUS_SUCCESS,
+			'status' => PaymentMethod::STATUS_SUCCESS,
 			'is_valid' => 1,
 			'signature' => '',
 			'remark' => '',
@@ -698,7 +698,7 @@ class InvoiceCestTestPaymentMethod extends \common\modules\payment\components\Pa
 	}
 	
 	public function getPaymentRecord() {
-		$payment = new \common\modules\payment\models\Payment([
+		$payment = new \ant\payment\models\Payment([
 			'transaction_id' => 'TEST_'.uniqid(),
 			'payment_gateway' => 'testPaymentGateway',
 			'data' => 'test',
@@ -709,7 +709,7 @@ class InvoiceCestTestPaymentMethod extends \common\modules\payment\components\Pa
 	}
 }
 
-class InvoiceCestBillableModel extends \yii\db\ActiveRecord implements \common\modules\payment\models\Billable {
+class InvoiceCestBillableModel extends \yii\db\ActiveRecord implements \ant\payment\models\Billable {
 	public function getDiscountAmount() {
 		
 	}

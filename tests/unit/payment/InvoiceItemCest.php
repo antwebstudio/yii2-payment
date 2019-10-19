@@ -3,8 +3,8 @@
 use yii\helpers\Html;
 //use tests\codeception\common\UnitTester;
 use common\modules\cart\models\CartItem;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceItem;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceItem;
 
 class InvoiceItemCest
 {

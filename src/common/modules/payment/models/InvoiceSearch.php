@@ -13,4 +13,8 @@ use common\modules\contact\models\Contact;
  */
 class InvoiceSearch extends \ant\payment\models\InvoiceSearch
 {
+	
+	public function init() {
+		if (YII_DEBUG) throw new \Exception('DEPRECATED');
+	}
 }

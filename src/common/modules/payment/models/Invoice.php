@@ -47,6 +47,10 @@ class Invoice extends ActiveRecord implements Payable
 	protected $_calculatedPaidAmount;
 	protected $_items = [];
 	protected $_billedTo;
+	
+	public function init() {
+		if (YII_DEBUG) throw new \Exception('DEPRECATED');
+	}
 
 	public function behaviors()
 	{

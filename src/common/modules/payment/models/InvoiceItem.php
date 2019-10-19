@@ -21,4 +21,8 @@ namespace common\modules\payment\models;
 class InvoiceItem extends \ant\payment\models\InvoiceItem
 {
 	
+	public function init() {
+		if (YII_DEBUG) throw new \Exception('DEPRECATED');
+	}
+	
 }

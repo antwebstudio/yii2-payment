@@ -5,7 +5,7 @@ namespace ant\payment\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\modules\payment\models\Invoice;
+use ant\payment\models\Invoice;
 use common\modules\contact\models\Contact;
 
 /**

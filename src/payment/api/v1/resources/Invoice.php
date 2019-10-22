@@ -6,7 +6,7 @@ use yii\helpers\Url;
 use yii\web\Linkable;
 use yii\web\Link;
 
-class Invoice extends \common\modules\payment\models\Invoice implements Linkable
+class Invoice extends \ant\payment\models\Invoice implements Linkable
 {
     public function fields()
     {

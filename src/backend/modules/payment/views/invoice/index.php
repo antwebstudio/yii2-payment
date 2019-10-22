@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\ArrayHelper;
-use common\modules\payment\models\Invoice;
-use common\modules\user\models\User;
+use ant\payment\models\Invoice;
+use ant\user\models\User;
 ?>
 <?php if ($searchModel->userId): ?>
     <?= \yii\bootstrap\Nav::widget([
@@ -9,7 +9,7 @@ use common\modules\user\models\User;
             'class' => 'nav-tabs',
             'style' => 'margin-bottom: 15px'
         ],
-        'items' => \Yii::$app->menu->getMenu(\common\modules\user\Module::MENU_VIEW_PROFILE, ['user' => User::findOne($searchModel->userId)]),
+        'items' => \Yii::$app->menu->getMenu(\ant\user\Module::MENU_VIEW_PROFILE, ['user' => User::findOne($searchModel->userId)]),
     ]) ?>
 <?php endif ?>
 

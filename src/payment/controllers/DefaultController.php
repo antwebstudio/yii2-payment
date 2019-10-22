@@ -8,16 +8,15 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\HttpException;
 
-use common\modules\payment\models\Payable;
-use common\modules\payment\models\Billable;
-use common\modules\payment\models\PayableItem;
-use common\modules\payment\models\PayableCallBack;
+use ant\payment\models\Payable;
+use ant\payment\models\Billable;
+use ant\payment\models\PayableItem;
 
 use common\modules\payment\models\Order;
-use common\modules\payment\components\PayPalExpressGateway;
-use common\modules\payment\components\IPay88Gateway;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceItem;
+use ant\payment\components\PayPalExpressGateway;
+use ant\payment\components\IPay88Gateway;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceItem;
 
 /**
  * Default controller for the `payment` module
@@ -112,7 +111,7 @@ class DefaultController extends Controller
     protected function onPaymentError($gateway, $response, $payableModel)
     {
 		
-		$payment = \common\modules\payment\models\Payment::findOne(['transaction_id' => $gateway->paymentRecord->transaction_id]);
+		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $gateway->paymentRecord->transaction_id]);
 		
 		if (!isset($payment)) {
 			$invoice = $this->getInvoice($payableModel);
@@ -138,7 +137,7 @@ class DefaultController extends Controller
 
     protected function onPaymentSuccessful($gateway, $payableModel, $backend = false)
     {
-		$payment = \common\modules\payment\models\Payment::findOne(['transaction_id' => $gateway->paymentRecord->transaction_id]);
+		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $gateway->paymentRecord->transaction_id]);
 		
 		if (!isset($payment)) {
 			$invoice = $this->getInvoice($payableModel);

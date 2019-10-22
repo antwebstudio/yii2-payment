@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\LinkPager;
 use yii\widgets\Pjax;
 use yii\helpers\ArrayHelper;
-use common\modules\payment\models\Invoice;
+use ant\payment\models\Invoice;
 
 $this->title = 'Invoice';
 ?>

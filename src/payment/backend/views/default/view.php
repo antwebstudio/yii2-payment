@@ -1,6 +1,6 @@
 <?php 
 use yii\helpers\Html;
-use common\modules\user\models\User;
+use ant\user\models\User;
 ?>
 <?php $form = \yii\widgets\ActiveForm::begin(['action' => ['/payment/invoice/pay', 'id' => $model->id]]) ?>
 	<div class="form-group">
@@ -12,12 +12,12 @@ use common\modules\user\models\User;
 <?php \yii\widgets\ActiveForm::end() ?>
 
 <div clas='table-responsive'>
-    <?= \common\modules\payment\widgets\InvoiceSummary::widget([
+    <?= \ant\payment\widgets\InvoiceSummary::widget([
             'model' => $model
         ]) 
     ?>
 
-    <?= \common\modules\payment\widgets\PaymentSummary::widget([
+    <?= \ant\payment\widgets\PaymentSummary::widget([
             'invoice_id' => $model->id
     	]) 
     ?>

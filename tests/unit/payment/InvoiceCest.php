@@ -526,7 +526,7 @@ class InvoiceCest
 	}
 	
 	protected function createContact($attributes) {
-		$contact = new \common\modules\contact\models\Contact;
+		$contact = new \ant\contact\models\Contact;
 		$contact->attributes = \yii\helpers\ArrayHelper::merge([
 			'contact_name' => 'test contact',
 			'email' => 'test@gmail.com',

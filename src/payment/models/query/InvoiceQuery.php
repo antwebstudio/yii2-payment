@@ -1,7 +1,15 @@
 <?php
 namespace ant\payment\models\query;
 
-class InvoiceQuery extends \common\components\ActiveQuery {
+class InvoiceQuery extends \yii\db\ActiveQuery {
+	public function behaviors() {
+		return [
+			[
+				'class' => 'ant\behaviors\DateTimeAttributeQueryBehavior',
+			],
+		];
+	}
+	
 	public function issueToUser($user) {
 		$user = is_object($user) ? $user : \ant\models\models\User::findOne($user);
 		

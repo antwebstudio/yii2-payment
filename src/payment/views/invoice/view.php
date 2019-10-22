@@ -1,5 +1,5 @@
 <?php
-use common\modules\payment\widgets\InvoiceSummary;
+use ant\payment\widgets\InvoiceSummary;
 
 ?>
 

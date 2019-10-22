@@ -3,9 +3,9 @@
 namespace ant\payment\models;
 
 use Yii;
-use common\helpers\Currency;
+use ant\helpers\Currency;
 use common\modules\discount\helpers\Discount;
-use common\modules\payment\models\PayableItem;
+use ant\payment\models\PayableItem;
 
 /**
  * This is the model class for table "{{%payment_invoice_item}}".
@@ -25,7 +25,7 @@ use common\modules\payment\models\PayableItem;
  */
 class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 {
-	use \common\modules\payment\traits\BillableTrait;
+	use \ant\payment\traits\BillableTrait;
 	
     /**
      * @inheritdoc
@@ -49,7 +49,7 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 		return
 		[
 			[
-				'class' => \common\behaviors\DuplicatableBehavior::className(),	
+				'class' => \ant\behaviors\DuplicatableBehavior::className(),	
 			],
 		];
 	}

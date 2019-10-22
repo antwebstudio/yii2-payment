@@ -4,11 +4,11 @@ namespace backend\modules\payment\controllers;
 
 use Yii;
 use yii\web\Controller;
-use common\modules\payment\models\Payment;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceSearch;
+use ant\payment\models\Payment;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceSearch;
 use common\modules\payment\models\Order;
-use common\modules\payment\components\FaceToFacePaymentMethod;
+use ant\payment\components\FaceToFacePaymentMethod;
 
 /**
  * Default controller for the `event` module

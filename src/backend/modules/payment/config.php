@@ -2,11 +2,11 @@
 
 return [
     'id' => 'payment',
-	'alias' => [
+	/*'alias' => [
 		'@frontend/modules/payment' => dirname(dirname(dirname(__DIR__))).'/frontend/modules/payment',
 		'@common/modules/payment' => dirname(dirname(dirname(__DIR__))).'/common/modules/payment',
 		'@backend/modules/payment' => dirname(dirname(dirname(__DIR__))).'/backend/modules/payment',
-	],
+	],*/
     'class' => \backend\modules\payment\Module::className(),
     'isCoreModule' => false,
 ];

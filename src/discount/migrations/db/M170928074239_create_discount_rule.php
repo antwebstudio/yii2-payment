@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\discount\migrations\db;
+namespace ant\discount\migrations\db;
 
 use yii\db\Migration;
 

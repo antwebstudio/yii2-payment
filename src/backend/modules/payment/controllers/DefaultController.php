@@ -4,8 +4,8 @@ namespace backend\modules\payment\controllers;
 
 use Yii;
 use yii\web\Controller;
-use common\modules\payment\models\Invoice;
-use common\modules\payment\models\InvoiceSearch;
+use ant\payment\models\Invoice;
+use ant\payment\models\InvoiceSearch;
 use common\modules\payment\models\Order;
 
 

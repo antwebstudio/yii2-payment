@@ -23,9 +23,9 @@ class Module extends \yii\base\Module
 	public function behaviors() {
 		return [
 			[
-				'class' => \common\behaviors\ConfigurableModuleBehavior::className(),
+				'class' => \ant\behaviors\ConfigurableModuleBehavior::className(),
 				'formModels' => [
-					'bankWire' => ['class' => \common\modules\payment\models\BankWireForm::className()],
+					'bankWire' => ['class' => \ant\payment\models\BankWireForm::className()],
 					/*'on '.\common\base\FormModel::EVENT_AFTER_SAVE => function($event) {
 						$formModel = $event->sender;
 						$formModel->sendNotificationEmailToAdmin();

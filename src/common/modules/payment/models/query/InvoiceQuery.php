@@ -7,9 +7,9 @@ class InvoiceQuery extends \common\components\ActiveQuery {
 		if (YII_DEBUG) throw new \Exception('DEPRECATED');
 		return parent::init();
 	}
-	public function __construct() {
+	public function __construct($class) {
 		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		return parent::__construct();
+		return parent::__construct($class);
 	}
 	
 	public function issueToUser($user) {

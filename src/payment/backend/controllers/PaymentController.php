@@ -3,7 +3,7 @@
 namespace ant\payment\backend\controllers;
 
 use Yii;
-use common\modules\payment\models\Payment;
+use ant\payment\models\Payment;
 
 /**
  * Default controller for the `event` module

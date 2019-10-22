@@ -115,14 +115,14 @@ class PaymentComponent extends \yii\base\Component {
 			throw new \Exception('Payable model type "'.$payType.'" not defined. ');
 		}
 		
-        return ($payable && (new $payable instanceof \common\modules\payment\models\Payable)) ? $payable : false;
+        return ($payable && (new $payable instanceof \ant\payment\models\Payable)) ? $payable : false;
     }
 
 	protected function getExtraPayOptions()
 	{
 		return
 		[
-			'invoice' => '\common\modules\payment\models\Invoice',
+			'invoice' => '\ant\payment\models\Invoice',
 			'order' => '\common\modules\order\models\Order'
 		];
 	}

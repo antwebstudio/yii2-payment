@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\discount\models;
+namespace ant\discount\models;
 
 use Yii;
 
@@ -40,7 +40,7 @@ class DiscountRule extends \yii\db\ActiveRecord
 			],
             [
                 'class' => \ant\behaviors\SerializeBehavior::className(),
-				'serializeMethod' => \common\behaviors\SerializeBehavior::METHOD_JSON,
+				'serializeMethod' => \ant\behaviors\SerializeBehavior::METHOD_JSON,
                 'attributes' => ['user_ids', 'product_ids', 'category_ids']
             ],
 		];

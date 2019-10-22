@@ -7,7 +7,7 @@ use yii\helpers\Console;
 use yii\helpers\Html;
 use console\components\Controller;
 use common\modules\payment\models\Order;
-use common\modules\payment\models\Invoice;
+use ant\payment\models\Invoice;
 
 class PaymentController extends Controller
 {
@@ -93,7 +93,7 @@ class PaymentController extends Controller
 		} elseif ($response->isSuccessful()) {
 			Console::output('Payment: Successful');
 			$order->detachBehavior(\yii\behaviors\BlameableBehavior::className());
-			$order->detachBehavior(\common\behaviors\IpBehavior::className());
+			$order->detachBehavior(\ant\behaviors\IpBehavior::className());
 			
 			if (!isset($order->invoice)) {
 				

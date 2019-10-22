@@ -5,7 +5,7 @@ use yii\base\Widget;
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
-use common\modules\payment\models\Payment;
+use ant\payment\models\Payment;
 use yii\data\ActiveDataProvider;
 
 class InvoiceSummary extends Widget{

@@ -7,13 +7,13 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\HttpException;
 use yii\data\ActiveDataProvider;
-use common\modules\payment\models\Payment;
+use ant\payment\models\Payment;
 
 class BankWireController extends Controller
 {
     public function actionIndex() {
         $dataProvider = new ActiveDataProvider([
-            'query' => Payment::find()->andWhere(['payment_gateway' => 'common\modules\payment\components\BankWirePaymentMethod']),
+            'query' => Payment::find()->andWhere(['payment_gateway' => 'ant\payment\components\BankWirePaymentMethod']),
         ]);
 
         return $this->render($this->action->id, [

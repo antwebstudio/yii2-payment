@@ -15,7 +15,7 @@ class BankWireController extends Controller
 		if (YII_DEBUG) throw new \Exception('DEPRECATED');
 		
         $dataProvider = new ActiveDataProvider([
-            'query' => Payment::find()->andWhere(['payment_gateway' => 'common\modules\payment\components\BankWirePaymentMethod']),
+            'query' => Payment::find()->andWhere(['payment_gateway' => 'ant\payment\components\BankWirePaymentMethod']),
         ]);
 
         return $this->render($this->action->id, [

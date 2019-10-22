@@ -9,7 +9,7 @@ use ant\payment\components\PaymentMethod;
 class BankWireForm extends \ant\base\FormModel {
     const SCENARIO_ATTACHMENT_ONLY = 'attachment_only';
 
-    public $paymentMethod = 'common\modules\payment\components\BankWirePaymentMethod';
+    public $paymentMethod = 'ant\payment\components\BankWirePaymentMethod';
     public $paymentSuccessMessage = 'Credit topup detail submitted succesfully, please allow a few working days for our admin to verify your submission. ';
     //public $paymentSuccessRoute = ['index'];
     public $bank;
@@ -23,10 +23,6 @@ class BankWireForm extends \ant\base\FormModel {
 
     protected $_payment;
     protected $_invoice;
-	
-	public function init() {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-	}
 
     public function rules() {
         return [

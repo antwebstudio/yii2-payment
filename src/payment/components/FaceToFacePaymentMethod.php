@@ -40,7 +40,7 @@ class FaceToFacePaymentMethod extends PaymentMethod
 			'amount' => $this->amount,
 			//'ref_no' => '1',
 			'currency' => 'MYR',
-			'status' => \common\modules\payment\components\PaymentMethod::STATUS_SUCCESS,
+			'status' => \ant\payment\components\PaymentMethod::STATUS_SUCCESS,
 			'is_valid' => 1,
 			'signature' => '',
 			'remark' => '',
@@ -51,7 +51,7 @@ class FaceToFacePaymentMethod extends PaymentMethod
     public function getPaymentRecord() {
         if (!isset($this->transactionId)) throw new \Exception('Transaction ID is not set. ');
         
-		$payment = new \common\modules\payment\models\Payment([
+		$payment = new \ant\payment\models\Payment([
 			'transaction_id' => $this->transactionId,
 			'payment_gateway' => self::class,
 			'data' => '-',

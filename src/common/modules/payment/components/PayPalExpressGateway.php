@@ -1,8 +1,8 @@
 <?php
-namespace common\modules\payment\components;
+namespace ant\payment\components;
 
-use common\modules\payment\components\PayPalPaymentMethod;
-use common\modules\payment\models\Payment;
+use ant\payment\components\PayPalPaymentMethod;
+use ant\payment\models\Payment;
 use Omnipay\Omnipay;
 
 class PayPalExpressGateway extends PayPalPaymentMethod {

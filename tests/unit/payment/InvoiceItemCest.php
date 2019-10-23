@@ -1,8 +1,6 @@
 <?php
-//namespace tests\codeception\common\payment;
 use yii\helpers\Html;
-//use tests\codeception\common\UnitTester;
-use common\modules\cart\models\CartItem;
+use ant\cart\models\CartItem;
 use ant\payment\models\Invoice;
 use ant\payment\models\InvoiceItem;
 

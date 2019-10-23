@@ -1,5 +1,5 @@
 <?php
-namespace common\modules\discount\components;
+namespace ant\discount\components;
 
 interface DiscountRuleInterface {
 	public function getDiscountForCartItem($cartItem);

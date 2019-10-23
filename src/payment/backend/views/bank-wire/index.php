@@ -1,7 +1,7 @@
 <?php
 use yii\grid\GridView;
 use yii\helpers\Html;
-use common\widgets\PhotoSwipe\PhotoSwipe;
+use ant\widgets\PhotoSwipe\PhotoSwipe;
 ?>
 
 <?= GridView::widget([

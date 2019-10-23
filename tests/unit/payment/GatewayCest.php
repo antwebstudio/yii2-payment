@@ -1,8 +1,5 @@
 <?php
-//namespace tests\codeception\common\payment;
-
-//use tests\codeception\common\UnitTester;
-use common\modules\payment\components\PayPalExpressGateway;
+use ant\payment\components\PayPalExpressGateway;
 
 class GatewayCest
 {

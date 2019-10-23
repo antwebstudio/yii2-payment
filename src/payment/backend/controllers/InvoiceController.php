@@ -7,7 +7,7 @@ use yii\web\Controller;
 use ant\payment\models\Payment;
 use ant\payment\models\Invoice;
 use ant\payment\models\InvoiceSearch;
-use common\modules\payment\models\Order;
+use ant\payment\models\Order;
 use ant\payment\components\FaceToFacePaymentMethod;
 
 /**

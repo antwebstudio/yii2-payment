@@ -1,18 +1,18 @@
 <?php
 
-namespace common\modules\payment\models;
+namespace ant\payment\models;
 
 use Yii;
 use yii\helpers\Html;
 use yii\db\ActiveRecord;
 
-use common\helpers\Currency;
-use common\modules\payment\models\Payable;
+use ant\helpers\Currency;
+use ant\payment\models\Payable;
 use ant\payment\interfaces\BillableItem;
-use common\modules\order\models\Order;
-use common\modules\user\models\User;
-use common\modules\contact\models\Contact;
-use common\modules\organization\models\Organization;
+use ant\order\models\Order;
+use ant\user\models\User;
+use ant\contact\models\Contact;
+use ant\organization\models\Organization;
 
 /**
  * This is the model class for table "{{%payment_invoice}}".
@@ -57,34 +57,34 @@ class Invoice extends ActiveRecord implements Payable
 		return
 		[
             [
-                'class' => \common\behaviors\AttachBehaviorBehavior::className(),
+                'class' => \ant\behaviors\AttachBehaviorBehavior::className(),
                 'config' => '@common/config/behaviors.php',
             ],
 			[
-				'class' => \common\behaviors\TimestampBehavior::className(),
+				'class' => \ant\behaviors\TimestampBehavior::className(),
 			],
 			'timestamp' => [
-				'class' => \common\behaviors\DateTimeAttributeBehavior::className(),
+				'class' => \ant\behaviors\DateTimeAttributeBehavior::className(),
 				'attributes' => ['issue_date'],
 			],
 			'formattedAutoColumn' => [
-				'class' => \common\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
+				'class' => \ant\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
 				'format' => isset(Yii::$app->getModule('payment')->invoiceNumberFormat) ? Yii::$app->getModule('payment')->invoiceNumberFormat : '#{id:5}',
 				'saveToAttribute' => 'formatted_id',
 				'createdDateAttribute' => 'issue_date',
 			],
 			[
-				'class' => \common\behaviors\DuplicatableBehavior::className(),	
+				'class' => \ant\behaviors\DuplicatableBehavior::className(),	
 			],
 			[
-                'class' => 'common\behaviors\DateTimeAttributeBehavior',
+                'class' => 'ant\behaviors\DateTimeAttributeBehavior',
                 'attributes' => [
 					'created_at', 'updated_at',
 				],
             ],
 			'privateUrl' => [
-				'class' => \common\behaviors\PrivateUrlBehavior::class,
-				'modelClassId' => \common\models\ModelClass::getClassId(self::class),
+				'class' => \ant\behaviors\PrivateUrlBehavior::class,
+				'modelClassId' => \ant\models\ModelClass::getClassId(self::class),
 				'route' => '/payment/invoice/view-by-link',
 				'uniqueSlug' => true,
 				'autoSlug' => function($owner) {
@@ -390,24 +390,24 @@ class Invoice extends ActiveRecord implements Payable
 	public function getIssuedTo() {
 		if (YII_DEBUG) throw new \Exception('DEPRECATED');
 
-		return $this->hasOne(\common\modules\user\models\User::className(), ['id' => 'issue_to']);
+		return $this->hasOne(\ant\user\models\User::className(), ['id' => 'issue_to']);
 	}
 	
 	public function getBilledTo() {
 		if (isset($this->issue_to) && $this->issue_to) {
-			return $this->hasOne(\common\modules\contact\models\Contact::className(), ['id' => 'billed_to']);
+			return $this->hasOne(\ant\contact\models\Contact::className(), ['id' => 'billed_to']);
 		} else if (isset($this->order)) {
 			if (!YII_DEBUG) return $this->order->billedTo;				
 		}
-		return $this->hasOne(\common\modules\contact\models\Contact::className(), ['id' => 'billed_to']);
+		return $this->hasOne(\ant\contact\models\Contact::className(), ['id' => 'billed_to']);
 	}
 
 	public function getContact(){
-		return $this->hasOne(\common\modules\contact\models\Contact::className(), ['id' => 'issue_to']);
+		return $this->hasOne(\ant\contact\models\Contact::className(), ['id' => 'issue_to']);
 	}
 	
 	public static function find() {
-		return new \common\modules\payment\models\query\InvoiceQuery(get_called_class());
+		return new \ant\payment\models\query\InvoiceQuery(get_called_class());
 	}
 
 	public static function createFromBillableItem(BillableItem $billableItem, $billTo = null) {

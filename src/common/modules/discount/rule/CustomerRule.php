@@ -1,7 +1,7 @@
 <?php
-namespace common\modules\discount\rule;
+namespace ant\discount\rule;
 
-class CustomerRule extends DiscountRule implements \common\modules\discount\components\DiscountRuleInterface {
+class CustomerRule extends DiscountRule implements \ant\discount\components\DiscountRuleInterface {
 	public $userGroups;
 	public $users;
 	

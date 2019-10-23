@@ -6,7 +6,7 @@ use yii\helpers\Url;
 use yii\helpers\Console;
 use yii\helpers\Html;
 use console\components\Controller;
-use common\modules\payment\models\Order;
+use ant\payment\models\Order;
 use ant\payment\models\Invoice;
 
 class PaymentController extends Controller
@@ -52,7 +52,7 @@ class PaymentController extends Controller
 	}
 	
 	/*protected function addSuccessfulPaymentRecord($gateway, $order) {
-		$adapter = new \common\modules\payment\components\PaymentRecordAdapter;
+		$adapter = new \ant\payment\components\PaymentRecordAdapter;
 		
 		$adapter->payment_gateway = $gateway::className();
 		$adapter->currency = $order->invoice->currency;

@@ -1,5 +1,5 @@
 <?php
-namespace common\modules\payment\components;
+namespace ant\payment\components;
 
 class PaymentRecordAdapter extends \ant\payment\components\PaymentRecordAdapter {
 }

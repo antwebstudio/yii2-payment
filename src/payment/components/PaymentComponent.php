@@ -123,7 +123,7 @@ class PaymentComponent extends \yii\base\Component {
 		return
 		[
 			'invoice' => '\ant\payment\models\Invoice',
-			'order' => '\common\modules\order\models\Order'
+			'order' => '\ant\order\models\Order'
 		];
 	}
 }

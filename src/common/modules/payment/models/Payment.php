@@ -1,11 +1,11 @@
 <?php
 
-namespace common\modules\payment\models;
+namespace ant\payment\models;
 
 use Yii;
 use yii\behaviors\BlameableBehavior;
-use common\behaviors\TimestampBehavior;
-use common\modules\payment\models\Invoice;
+use ant\behaviors\TimestampBehavior;
+use ant\payment\models\Invoice;
 
 /**
  * This is the model class for table "{{%payment}}".
@@ -54,21 +54,21 @@ class Payment extends \yii\db\ActiveRecord
 				'class' => TimestampBehavior::className(),
 			],
 			[
-				'class' => \common\behaviors\SerializeBehavior::className(),
-				'serializeMethod' => \common\behaviors\SerializeBehavior::METHOD_JSON,
+				'class' => \ant\behaviors\SerializeBehavior::className(),
+				'serializeMethod' => \ant\behaviors\SerializeBehavior::METHOD_JSON,
 				'attributes' => ['data'],
 			],
             [
-                'class' => \common\behaviors\AttachBehaviorBehavior::className(),
+                'class' => \ant\behaviors\AttachBehaviorBehavior::className(),
                 'config' => '@common/config/behaviors.php',
             ],
 		];
 		
 		if (Yii::$app->getModule('file') != null) {
 			$behaviors[] = [
-				'class' => \common\modules\file\behaviors\AttachmentBehavior::className(),
+				'class' => \ant\file\behaviors\AttachmentBehavior::className(),
 				'attribute' => 'attachments',
-				'modelType' => \common\modules\payment\models\Payment::className(),
+				'modelType' => \ant\payment\models\Payment::className(),
 				'multiple' => true,
 			];
 		}
@@ -145,7 +145,7 @@ class Payment extends \yii\db\ActiveRecord
 
     public function getIsManual() {
         // @TODO remove hard code
-        if ($this->payment_gateway == 'common\modules\payment\components\BankWirePaymentMethod') {
+        if ($this->payment_gateway == 'ant\payment\components\BankWirePaymentMethod') {
             return true;
         }
         return false;

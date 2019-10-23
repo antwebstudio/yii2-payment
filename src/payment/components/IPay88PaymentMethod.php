@@ -1,7 +1,7 @@
 <?php
 namespace ant\payment\components;
 
-class IPay88PaymentMethod extends \common\modules\payment\components\PaymentMethod
+class IPay88PaymentMethod extends \ant\payment\components\PaymentMethod
 {
 	public function setConfig($gatewayConfig) {
 		if (isset($gatewayConfig['sandboxUrl'])) $gatewayConfig['sandboxUrl'] = \yii\helpers\Url::to($gatewayConfig['sandboxUrl'], true);

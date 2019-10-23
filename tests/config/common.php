@@ -3,6 +3,7 @@ return [
 	'id' => 'app-test',
 	'basePath' => dirname(__DIR__),
 	'aliases' => [
+		'ant' => dirname(dirname(__DIR__)).'/src',
 		'api' => dirname(dirname(__DIR__)).'/src/api',
 		'common/config' => __DIR__, // dirname(dirname(__DIR__)).'/vendor/inspirenmy/yii2-core/src/common/config',
 		'vendor' => dirname(dirname(__DIR__)).'/vendor',
@@ -28,9 +29,9 @@ return [
             'charset' => 'utf8',
         ],
         'moduleManager' => [
-            'class' => 'common\modules\moduleManager\components\ModuleManager',
+            'class' => 'ant\moduleManager\ModuleManager',
 			'moduleAutoloadPaths' => [
-				'@common/modules', 
+				'@ant', 
 				'@vendor/inspirenmy/yii2-ecommerce/src/common/modules', 
 				'@vendor/inspirenmy/yii2-user/src/common/modules',
 				'@vendor/inspirenmy/yii2-core/src/common/modules',
@@ -39,19 +40,19 @@ return [
 		// Needed for rbca migration, else error occured when run yii migrate
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            'defaultRoles' => [\common\rbac\Role::ROLE_GUEST, \common\rbac\Role::ROLE_USER],
+            'defaultRoles' => [\ant\rbac\Role::ROLE_GUEST, \ant\rbac\Role::ROLE_USER],
         ],
         'user' => [
 			'class' => 'yii\web\User',
-            'identityClass' => 'common\modules\user\models\User',
+            'identityClass' => 'ant\user\models\User',
         ],
 	],
 	'controllerMap' => [
 		'module' => [
-			'class' => 'common\modules\moduleManager\console\controllers\DefaultController',
+			'class' => 'ant\moduleManager\console\controllers\DefaultController',
 		],
 		'migrate' => [
-			'class' => 'common\modules\moduleManager\console\controllers\MigrateController',
+			'class' => 'ant\moduleManager\console\controllers\MigrateController',
             'migrationPath' => [
                 '@common/migrations/db',
                 '@yii/rbac/migrations',
@@ -59,18 +60,18 @@ return [
             ],
             'migrationNamespaces' => [
                 'yii\queue\db\migrations',
-				'common\modules\moduleManager\migrations\db',
+				'ant\moduleManager\migrations\db',
 			],
             'migrationTable' => '{{%system_db_migration}}'
 		],
 		'rbac-migrate' => [
-			'class' => 'common\modules\moduleManager\console\controllers\RbacMigrateController',
+			'class' => 'ant\moduleManager\console\controllers\RbacMigrateController',
             'migrationPath' => [
                 '@common/migrations/rbac',
             ],
             'migrationTable' => '{{%system_rbac_migration}}',
             'migrationNamespaces' => [
-                'common\modules\moduleManager\migrations\rbac',
+                'ant\moduleManager\migrations\rbac',
 			],
             'templateFile' => '@common/rbac/views/migration.php'
 		],

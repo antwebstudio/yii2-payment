@@ -65,7 +65,7 @@ class Payment extends \yii\db\ActiveRecord
 		
 		if (Yii::$app->getModule('file') != null) {
 			$behaviors[] = [
-				'class' => \common\modules\file\behaviors\AttachmentBehavior::className(),
+				'class' => \ant\file\behaviors\AttachmentBehavior::className(),
 				'attribute' => 'attachments',
 				'modelType' => \ant\payment\models\Payment::className(),
 				'multiple' => true,

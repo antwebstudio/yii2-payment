@@ -12,7 +12,7 @@ use ant\payment\models\Payable;
 use ant\payment\models\Billable;
 use ant\payment\models\PayableItem;
 
-use common\modules\payment\models\Order;
+use ant\payment\models\Order;
 use ant\payment\components\PayPalExpressGateway;
 use ant\payment\components\IPay88Gateway;
 use ant\payment\models\Invoice;
@@ -40,7 +40,7 @@ class DefaultController extends Controller
 		
 		$payableModel = $this->getPayableModel($type, $payId);
 		
-		if ($payableModel instanceof \common\interfaces\Expirable && $payableModel->isExpired) throw new \Exception('The payable is expired. ');
+		if ($payableModel instanceof \ant\interfaces\Expirable && $payableModel->isExpired) throw new \Exception('The payable is expired. ');
 		
 		\Yii::$app->payment->setCancelUrl($cancelUrl);
 

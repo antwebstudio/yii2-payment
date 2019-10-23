@@ -9,7 +9,7 @@ use ant\payment\models\Invoice;
 use ant\contact\models\Contact;
 
 /**
- * InvoiceSearch represents the model behind the search form about `common\modules\payment\models\Invoice`.
+ * InvoiceSearch represents the model behind the search form about `ant\payment\models\Invoice`.
  */
 class InvoiceSearch extends Invoice
 {

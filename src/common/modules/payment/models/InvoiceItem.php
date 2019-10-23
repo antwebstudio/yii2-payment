@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\payment\models;
+namespace ant\payment\models;
 
 /**
  * This is the model class for table "{{%payment_invoice_item}}".

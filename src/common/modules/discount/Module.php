@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\discount;
+namespace ant\discount;
 
 /**
  * discount module definition class
@@ -10,7 +10,7 @@ class Module extends \yii\base\Module
     /**
      * @inheritdoc
      */
-    public $controllerNamespace = 'common\modules\discount\controllers';
+    public $controllerNamespace = 'ant\discount\controllers';
 
     /**
      * @inheritdoc

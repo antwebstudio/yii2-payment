@@ -4,7 +4,7 @@ namespace ant\payment\models;
 
 use Yii;
 use ant\helpers\Currency;
-use common\modules\discount\helpers\Discount;
+use ant\discount\helpers\Discount;
 use ant\payment\models\PayableItem;
 
 /**
@@ -143,7 +143,7 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 	}
 	
 	public function setDiscount($discount, $discountType = 0) {
-		if ($discount instanceof \common\modules\discount\helpers\Discount) {
+		if ($discount instanceof \ant\discount\helpers\Discount) {
 			$this->discount_value = $discount->value;
 			$this->discount_type = $discount->type;
 		} else {
@@ -153,7 +153,7 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 	}
 	
 	public function getDiscount() {
-		return new \common\modules\discount\helpers\Discount($this->discount_value, $this->discount_type);
+		return new \ant\discount\helpers\Discount($this->discount_value, $this->discount_type);
 	}
 	
 	public function deductAvailableQuantity($quantity) {

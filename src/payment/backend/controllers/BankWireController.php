@@ -7,7 +7,7 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\HttpException;
 use yii\data\ActiveDataProvider;
-use common\modules\payment\models\Payment;
+use ant\payment\models\Payment;
 
 class BankWireController extends Controller
 {

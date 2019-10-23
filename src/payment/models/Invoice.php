@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 use ant\helpers\Currency;
 use ant\payment\models\Payable;
 use ant\payment\interfaces\BillableItem;
-use common\modules\order\models\Order;
+use ant\order\models\Order;
 use ant\user\models\User;
 use ant\contact\models\Contact;
 use ant\organization\models\Organization;

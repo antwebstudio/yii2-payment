@@ -1,5 +1,5 @@
 <?php
-namespace common\modules\payment\notifications;
+namespace ant\payment\notifications;
 
 use tuyakhov\notifications\NotificationInterface;
 use tuyakhov\notifications\NotificationTrait;

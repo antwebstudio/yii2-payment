@@ -1,7 +1,7 @@
 <?php
-namespace common\modules\payment\models\query;
+namespace ant\payment\models\query;
 
-class InvoiceQuery extends \common\components\ActiveQuery {
+class InvoiceQuery extends \ant\components\ActiveQuery {
 	
 	public function init() {
 		if (YII_DEBUG) throw new \Exception('DEPRECATED');

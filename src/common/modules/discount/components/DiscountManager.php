@@ -1,9 +1,9 @@
 <?php
-namespace common\modules\discount\components;
+namespace ant\discount\components;
 
 use Yii;
-use common\modules\discount\helpers\Discount;
-use common\modules\discount\models\DiscountRule;
+use ant\discount\helpers\Discount;
+use ant\discount\models\DiscountRule;
 
 class DiscountManager extends \yii\base\Component {
 	
@@ -12,11 +12,11 @@ class DiscountManager extends \yii\base\Component {
 	
 	public function getRules() {
 		if (!isset($this->rules)) {
-			$this->rules = \common\modules\discount\models\DiscountRule::find()->all();
+			$this->rules = \ant\discount\models\DiscountRule::find()->all();
 		}
 		$rules = [];
 		foreach ($this->rules as $rule) {
-			if ($rule instanceof \common\modules\discount\models\DiscountRule) {
+			if ($rule instanceof \ant\discount\models\DiscountRule) {
 				$rules[] = Yii::createObject([
 					'class' => $rule->class,
 					'discount_percent' => $rule->discount_percent,
@@ -57,7 +57,7 @@ class DiscountManager extends \yii\base\Component {
 		if (!\Yii::$app->user->isGuest) {
 			$percentage = \Yii::$app->user->identity->getDynamicAttribute('discountRate');
 			
-			$rules = DiscountRule::find()->andWhere(['class' => \common\modules\discount\rule\CatalogRule::className()])->all();
+			$rules = DiscountRule::find()->andWhere(['class' => \ant\discount\rule\CatalogRule::className()])->all();
 			
 			if (isset($rules)) {
 				return $percentage / 100;

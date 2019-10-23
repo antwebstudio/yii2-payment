@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\discount\controllers;
+namespace ant\discount\controllers;
 
 use yii\web\Controller;
 

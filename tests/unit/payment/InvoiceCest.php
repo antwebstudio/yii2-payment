@@ -1,9 +1,5 @@
 <?php
-//namespace tests\codeception\common\payment;
-
-//use Yii;
-//use tests\codeception\common\UnitTester;
-use common\modules\discount\helpers\Discount;
+use ant\discount\helpers\Discount;
 use ant\payment\models\Invoice;
 use ant\payment\models\InvoiceItem;
 use ant\payment\models\Payable;
@@ -22,11 +18,11 @@ class InvoiceCest
 		\Yii::configure(\Yii::$app, [
             'components' => [
 				'discount' => [
-					'class' => 'common\modules\discount\components\DiscountManager',
+					'class' => 'ant\discount\components\DiscountManager',
 					'rules' => [],
 				],
 				'cart' => [
-					'class' => 'common\modules\cart\components\CartManager',
+					'class' => 'ant\cart\components\CartManager',
 					'types' => [
 						'default' => [
 							'item' => function() {
@@ -76,7 +72,7 @@ class InvoiceCest
     	$invoice = new Invoice();
 		
 		$invoice->attachBehavior('formattedAutoColumn', [
-			'class' => \common\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
+			'class' => \ant\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
 			'format' => 'CW{date:y}{id:4}',
 			'saveToAttribute' => 'formatted_id',
 			'createdDateAttribute' => 'issue_date',
@@ -106,7 +102,7 @@ class InvoiceCest
 		
 		$invoice = new Invoice();
 		$invoice->attachBehavior('formattedAutoColumn', [
-			'class' => \common\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
+			'class' => \ant\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
 			'format' => $format,
 			'saveToAttribute' => 'formatted_id',
 			'createdDateAttribute' => 'issue_date',
@@ -127,7 +123,7 @@ class InvoiceCest
 		
 		$invoice = new Invoice();
 		$invoice->attachBehavior('formattedAutoColumn', [
-			'class' => \common\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
+			'class' => \ant\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
 			'format' => $format,
 			'saveToAttribute' => 'formatted_id',
 			'createdDateAttribute' => 'issue_date',
@@ -146,7 +142,7 @@ class InvoiceCest
 		
 		$invoice = new Invoice();
 		$invoice->attachBehavior('formattedAutoColumn', [
-			'class' => \common\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
+			'class' => \ant\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
 			'format' => $format,
 			'saveToAttribute' => 'formatted_id',
 			'createdDateAttribute' => 'issue_date',

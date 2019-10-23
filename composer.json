@@ -15,8 +15,8 @@
         "league/omnipay": "^2.3",
         "omnipay/paypal": "~2.0",
         "inspirenmy/omnipay-ipay88": "*",
-		"inspirenmy/yii2-core" : "*",
-		"inspirenmy/yii2-user" : "*"
+		"antweb/yii2-core" : "*",
+		"antweb/yii2-user" : "*"
 	},
     "require-dev": {
         "yiisoft/yii2-codeception": "~2.0.0",

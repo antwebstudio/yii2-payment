@@ -1,9 +1,9 @@
 <?php
-namespace common\modules\payment\components;
+namespace ant\payment\components;
 
 use Yii;
-use common\modules\payment\components\PaymentMethod;
-use common\modules\payment\models\Invoice;
+use ant\payment\components\PaymentMethod;
+use ant\payment\models\Invoice;
 
 class BankWirePaymentMethod extends PaymentMethod
 {

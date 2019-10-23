@@ -1,6 +1,4 @@
 <?php
-//namespace tests\codeception\common\payment;
-//use tests\codeception\common\UnitTester;
 use ant\payment\models\Payment;
 use ant\payment\models\Invoice;
 use ant\payment\models\InvoiceItem;

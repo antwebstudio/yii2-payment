@@ -1,5 +1,5 @@
 <?php
-namespace common\modules\payment\components;
+namespace ant\payment\components;
 
 use Yii;
 use yii\helpers\Url;

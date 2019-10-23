@@ -1,7 +1,7 @@
 <?php
-namespace common\modules\payment\traits;
+namespace ant\payment\traits;
 
-use common\helpers\Currency;
+use ant\helpers\Currency;
 
 trait BillableTrait {
 	public function getNetTotal() {

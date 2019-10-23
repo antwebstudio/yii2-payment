@@ -1,6 +1,4 @@
 <?php
-//namespace tests\codeception\common\payment;
-//use tests\codeception\common\UnitTester;
 
 class PurchaseResponseCest
 {

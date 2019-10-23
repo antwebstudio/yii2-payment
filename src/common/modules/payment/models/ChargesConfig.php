@@ -1,6 +1,6 @@
 <?php
 
-namespace common\modules\payment\models;
+namespace ant\payment\models;
 
 use Yii;
 

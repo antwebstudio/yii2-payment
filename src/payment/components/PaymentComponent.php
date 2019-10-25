@@ -6,6 +6,7 @@ use yii\helpers\Url;
 
 class PaymentComponent extends \yii\base\Component {
 	const SESSION_PAYMENT_SUCCESS_URL = 'paymentSuccessUrl';
+	const SESSION_PAYMENT_URL = 'paymentUrl';
 	
 	public $paymentGateway;
 	public $paymentGatewaySandbox;
@@ -82,15 +83,19 @@ class PaymentComponent extends \yii\base\Component {
 		if (is_callable($this->successUrl)) {
 			return call_user_func_array($this->successUrl, [$payableModel]);
 		} else {
-			return \Yii::$app->session->get(self::SESSION_PAYMENT_SUCCESS_URL, $payableModel->privateRoute);
+			return \Yii::$app->session->get(self::SESSION_PAYMENT_SUCCESS_URL, isset($this->successUrl) ? $this->successUrl : $payableModel->privateRoute);
 		}
+	}
+	
+	public function setPaymentCancelUrl($url) {
+		return \Yii::$app->session->set(self::SESSION_PAYMENT_URL, $url);
 	}
 	
 	public function getPaymentCancelUrl($payableModel) {
 		if (is_callable($this->cancelUrl)) {
 			return call_user_func_array($this->cancelUrl, [$payableModel]);
 		} else {
-			return $this->cancelUrl;
+			return \Yii::$app->session->get(self::SESSION_PAYMENT_URL, $this->cancelUrl);
 		}
 	}
 	

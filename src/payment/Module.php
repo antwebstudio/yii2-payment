@@ -45,6 +45,10 @@ class Module extends \yii\base\Module
         // custom initialization code goes here
     }
 	
+	public function setPaymentPageUrl($url) {
+		return \Yii::$app->payment->setPaymentCancelUrl($url);
+	}
+	
 	public function getPaymentPageUrl($payableModel) {
 		return \Yii::$app->payment->getPaymentCancelUrl($payableModel);
 	}

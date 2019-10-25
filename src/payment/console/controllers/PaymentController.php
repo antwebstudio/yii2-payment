@@ -5,7 +5,7 @@ use Yii;
 use yii\helpers\Url;
 use yii\helpers\Console;
 use yii\helpers\Html;
-use console\components\Controller;
+use ant\console\components\Controller;
 use ant\payment\models\Order;
 use ant\payment\models\Invoice;
 

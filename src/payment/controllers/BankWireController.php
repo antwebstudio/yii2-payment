@@ -45,6 +45,14 @@ class BankWireController extends Controller
         ]);
     }
 	
+	public function actionPayLater($invoice) {
+		$model = Invoice::findOne($invoice);
+		
+        return $this->render($this->action->id, [
+            'model' => $model,
+        ]);
+	}
+	
 	public function actionPaymentSuccess($invoice) {
 		$model = Invoice::findOne($invoice);
 

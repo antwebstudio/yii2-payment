@@ -177,6 +177,10 @@ class Invoice extends ActiveRecord implements Payable
         ];
     }
 	
+	public function getAdminPanelRoute($params = []) {
+		return ['/payment/backend/invoice/view', 'id' => $this->id];
+	}
+	
 	public function getAdminPanelPrivateRoute($params = []) {
 		return $this->getPrivateRoute($params);
 	}

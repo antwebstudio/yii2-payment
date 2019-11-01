@@ -33,8 +33,6 @@ class InvoiceController extends Controller
      */
     public function actionPay($id)
     {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
 		$model = Invoice::findOne($id);
 		
 		if (($amount = Yii::$app->request->post('amount')) && ($transactionId = Yii::$app->request->post('transactionId'))) {
@@ -64,20 +62,16 @@ class InvoiceController extends Controller
 			}
 		}
 		
-        return $this->redirect($model->route);
+        return $this->redirect($model->adminPanelRoute);
 	}
 
-    public function actionView($id){
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
-    	$model = Invoice::find()->andWhere(['id' => $id])->one();
+    public function actionView($id) {
+		$model = Invoice::find()->andWhere(['id' => $id])->one();
         
     	return $this->render('view', ['model' => $model]);
     }
 
-    public function actionViewByLink($privateSlug){
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
+    public function actionViewByLink($privateSlug) {
         $id = Invoice::decodeId($privateSlug);
         $model = Invoice::findOne($id);
 
@@ -88,8 +82,6 @@ class InvoiceController extends Controller
     }
 	
 	public function actionIndex($user = null) {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
 		$model = new InvoiceSearch;
 		$model->userId = $user;
 		$dataProvider = $model->search(\Yii::$app->request->queryParams);

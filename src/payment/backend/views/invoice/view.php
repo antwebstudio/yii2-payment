@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use ant\user\models\User;
 ?>
-<?php $form = \yii\widgets\ActiveForm::begin(['action' => ['/payment/invoice/pay', 'id' => $model->id]]) ?>
+<?php $form = \yii\widgets\ActiveForm::begin(['action' => ['/payment/backend/invoice/pay', 'id' => $model->id]]) ?>
 	<div class="form-group">
         <?= Html::hiddenInput('transactionId', 'F2F_'.uniqid()) ?>
 		<?= Html::textInput('amount', $model->dueAmount, ['number' => true, 'class' => 'form-control']) ?>

@@ -17,7 +17,7 @@ use ant\user\models\User;
     'layout' => "{items}\n{pager}",
 	'dataProvider' => $dataProvider,
 	'filterModel' => $searchModel,
-	'options' => ['class' => 'table-responsive'],
+	'options' => ['class' => 'table-responsive', 'data-tester-selector' => 'invoices'],
 	'tableOptions' => ['class' => 'table table-striped table-bordered align-middle'],
 	'columns' => 
 	[

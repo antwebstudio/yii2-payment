@@ -15,6 +15,7 @@ class M181022094024_permissions extends Migration
 			\ant\payment\controllers\BankWireController::className() => [
 				'index' => ['View own bank-wire payment history', [Role::ROLE_USER]],
 				'create' => ['Submit bank wire payment', [Role::ROLE_USER]],
+				'pay-later' => ['Submit bank wire payment later', [Role::ROLE_USER]],
 				'payment-success' => ['Submit bank wire payment success', [Role::ROLE_USER]],
 			],
 			\ant\payment\controllers\DefaultController::className() => [

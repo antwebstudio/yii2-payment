@@ -22,8 +22,6 @@ class PaymentController extends \yii\web\Controller {
     }
 
     public function actionApprove($id) {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
         $model = Payment::findOne($id);
         
         if ($model->status != Payment::STATUS_SUCCESS) {
@@ -38,8 +36,6 @@ class PaymentController extends \yii\web\Controller {
     }
 
     public function actionUnapprove($id) {
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
         $model = Payment::findOne($id);
         
         if ($model->status == Payment::STATUS_SUCCESS) {

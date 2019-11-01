@@ -94,9 +94,9 @@ use ant\payment\models\Payment;
                     'approve' => function($url, $model) {
                         if ($model->isManual) {
                             if ($model->status == Payment::STATUS_SUCCESS) {
-                                return Html::a('Unapprove', ['/payment/payment/unapprove', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
+                                return Html::a('Unapprove', ['/payment/backend/payment/unapprove', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
                             } else {
-                                return Html::a('Approve', ['/payment/payment/approve', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
+                                return Html::a('Approve', ['/payment/backend/payment/approve', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
                             }                            
                         }
                     }

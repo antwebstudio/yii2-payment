@@ -1,6 +1,6 @@
 <?php
 
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
 /**
  * This is the model class for table "{{%payment_invoice_item}}".
@@ -18,7 +18,7 @@ namespace ant\payment\models;
  *
  * @property PaymentInvoice $invoice
  */
-class InvoiceItem extends \ant\payment\models\InvoiceItem
+class InvoiceItem extends \common\modules\payment\models\InvoiceItem
 {
 	
 	public function init() {

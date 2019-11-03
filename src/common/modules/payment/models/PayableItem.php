@@ -1,7 +1,7 @@
 <?php
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
-interface PayableItem extends \ant\payment\models\BillableItem
+interface PayableItem extends \common\modules\payment\models\BillableItem
 {
 	public function deductAvailableQuantity($quantity);
 }

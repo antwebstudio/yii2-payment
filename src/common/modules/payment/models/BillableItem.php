@@ -1,6 +1,6 @@
 <?php
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
-interface BillableItem extends \ant\payment\interfaces\BillableItem
+interface BillableItem extends \common\modules\payment\interfaces\BillableItem
 {
 }

@@ -1,5 +1,5 @@
 <?php
-namespace ant\discount\rule;
+namespace common\modules\discount\rule;
 
 use yii\helpers\ArrayHelper;
 

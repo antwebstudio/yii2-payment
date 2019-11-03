@@ -1,10 +1,10 @@
 <?php
-namespace ant\payment\widgets;
+namespace common\modules\payment\widgets;
 
 use yii\base\Widget;
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
-use ant\payment\models\Payment;
+use common\modules\payment\models\Payment;
 use yii\data\ActiveDataProvider;
 class PaymentSummary extends Widget{
 	public $model;

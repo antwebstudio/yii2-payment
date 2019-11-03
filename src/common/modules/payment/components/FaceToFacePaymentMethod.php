@@ -1,9 +1,9 @@
 <?php
-namespace ant\payment\components;
+namespace common\modules\payment\components;
 
 use Yii;
-use ant\payment\components\PaymentMethod;
-use ant\payment\models\Invoice;
+use common\modules\payment\components\PaymentMethod;
+use common\modules\payment\models\Invoice;
 
 class FaceToFacePaymentMethod extends PaymentMethod
 {
@@ -40,7 +40,7 @@ class FaceToFacePaymentMethod extends PaymentMethod
 			'amount' => $this->amount,
 			//'ref_no' => '1',
 			'currency' => 'MYR',
-			'status' => \ant\payment\components\PaymentMethod::STATUS_SUCCESS,
+			'status' => \common\modules\payment\components\PaymentMethod::STATUS_SUCCESS,
 			'is_valid' => 1,
 			'signature' => '',
 			'remark' => '',
@@ -51,7 +51,7 @@ class FaceToFacePaymentMethod extends PaymentMethod
     public function getPaymentRecord() {
         if (!isset($this->transactionId)) throw new \Exception('Transaction ID is not set. ');
         
-		$payment = new \ant\payment\models\Payment([
+		$payment = new \common\modules\payment\models\Payment([
 			'transaction_id' => $this->transactionId,
 			'payment_gateway' => self::class,
 			'data' => '-',

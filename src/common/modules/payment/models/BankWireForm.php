@@ -1,15 +1,15 @@
 <?php
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
 use yii\helpers\Html;
 use ant\helpers\DateTime;
-use ant\payment\models\Payment;
-use ant\payment\components\PaymentMethod;
+use common\modules\payment\models\Payment;
+use common\modules\payment\components\PaymentMethod;
 
 class BankWireForm extends \ant\base\FormModel {
     const SCENARIO_ATTACHMENT_ONLY = 'attachment_only';
 
-    public $paymentMethod = 'ant\payment\components\BankWirePaymentMethod';
+    public $paymentMethod = 'common\modules\payment\components\BankWirePaymentMethod';
     public $paymentSuccessMessage = 'Credit topup detail submitted succesfully, please allow a few working days for our admin to verify your submission. ';
     //public $paymentSuccessRoute = ['index'];
     public $bank;

@@ -1,14 +1,14 @@
 <?php
 
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
 use Yii;
 use yii\helpers\Html;
 use yii\db\ActiveRecord;
 
 use ant\helpers\Currency;
-use ant\payment\models\Payable;
-use ant\payment\interfaces\BillableItem;
+use common\modules\payment\models\Payable;
+use common\modules\payment\interfaces\BillableItem;
 use ant\order\models\Order;
 use ant\user\models\User;
 use ant\contact\models\Contact;
@@ -407,7 +407,7 @@ class Invoice extends ActiveRecord implements Payable
 	}
 	
 	public static function find() {
-		return new \ant\payment\models\query\InvoiceQuery(get_called_class());
+		return new \common\modules\payment\models\query\InvoiceQuery(get_called_class());
 	}
 
 	public static function createFromBillableItem(BillableItem $billableItem, $billTo = null) {

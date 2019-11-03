@@ -1,5 +1,5 @@
 <?php
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
 class Order extends \ant\order\models\Order {
 	public function init() {

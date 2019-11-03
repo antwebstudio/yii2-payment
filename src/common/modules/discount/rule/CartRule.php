@@ -1,7 +1,7 @@
 <?php
-namespace ant\discount\rule;
+namespace common\modules\discount\rule;
 
-class CartRule extends DiscountRule implements \ant\discount\components\DiscountRuleInterface {
+class CartRule extends DiscountRule implements \common\modules\discount\components\DiscountRuleInterface {
 
 	public $priority = 10;
 	

@@ -1,6 +1,6 @@
 <?php
-namespace ant\payment\components;
+namespace common\modules\payment\components;
 
-interface PaymentMethodInterface extends \ant\payment\components\PaymentMethodInterface
+interface PaymentMethodInterface extends \common\modules\payment\components\PaymentMethodInterface
 {
 }

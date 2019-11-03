@@ -1,5 +1,5 @@
 <?php
-namespace ant\discount\helpers;
+namespace common\modules\discount\helpers;
 
 class Discount {
 	const TYPE_PERCENT = 1;

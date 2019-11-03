@@ -1,5 +1,5 @@
 <?php
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
 interface Billable
 {

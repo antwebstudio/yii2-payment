@@ -1,6 +1,6 @@
 <?php
-namespace ant\payment\components;
+namespace common\modules\payment\components;
 
-class IPay88PaymentMethod extends \ant\payment\components\IPay88PaymentMethod
+class IPay88PaymentMethod extends \common\modules\payment\components\IPay88PaymentMethod
 {
 }

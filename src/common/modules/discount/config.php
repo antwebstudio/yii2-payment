@@ -2,8 +2,8 @@
 
 return [
     'id' => 'discount',
-	'namespace' => 'ant\discount',
-    'class' => \ant\discount\Module::className(),
+	'namespace' => 'common\modules\discount',
+    'class' => \common\modules\discount\Module::className(),
     'isCoreModule' => false,
 ];
 ?>

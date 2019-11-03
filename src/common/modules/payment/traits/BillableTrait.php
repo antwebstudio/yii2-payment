@@ -1,5 +1,5 @@
 <?php
-namespace ant\payment\traits;
+namespace common\modules\payment\traits;
 
 use ant\helpers\Currency;
 

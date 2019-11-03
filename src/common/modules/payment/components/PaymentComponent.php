@@ -1,8 +1,8 @@
 <?php
-namespace ant\payment\components;
+namespace common\modules\payment\components;
 
 use Yii;
 use yii\helpers\Url;
 
-class PaymentComponent extends \ant\payment\components\PaymentComponent {
+class PaymentComponent extends \common\modules\payment\components\PaymentComponent {
 }

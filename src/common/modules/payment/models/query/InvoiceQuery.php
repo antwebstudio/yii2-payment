@@ -1,5 +1,5 @@
 <?php
-namespace ant\payment\models\query;
+namespace common\modules\payment\models\query;
 
 class InvoiceQuery extends \ant\components\ActiveQuery {
 	

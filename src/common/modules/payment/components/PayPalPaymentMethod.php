@@ -1,7 +1,7 @@
 <?php
-namespace ant\payment\components;
+namespace common\modules\payment\components;
 
-use ant\payment\components\PaymentMethod;
+use common\modules\payment\components\PaymentMethod;
 
 class PayPalPaymentMethod extends PaymentMethod
 {

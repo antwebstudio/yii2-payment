@@ -1,11 +1,11 @@
 <?php
 
-namespace ant\payment\models;
+namespace common\modules\payment\models;
 
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use ant\behaviors\TimestampBehavior;
-use ant\payment\models\Invoice;
+use common\modules\payment\models\Invoice;
 
 /**
  * This is the model class for table "{{%payment}}".
@@ -68,7 +68,7 @@ class Payment extends \yii\db\ActiveRecord
 			$behaviors[] = [
 				'class' => \ant\file\behaviors\AttachmentBehavior::className(),
 				'attribute' => 'attachments',
-				'modelType' => \ant\payment\models\Payment::className(),
+				'modelType' => \common\modules\payment\models\Payment::className(),
 				'multiple' => true,
 			];
 		}
@@ -145,7 +145,7 @@ class Payment extends \yii\db\ActiveRecord
 
     public function getIsManual() {
         // @TODO remove hard code
-        if ($this->payment_gateway == 'ant\payment\components\BankWirePaymentMethod') {
+        if ($this->payment_gateway == 'common\modules\payment\components\BankWirePaymentMethod') {
             return true;
         }
         return false;

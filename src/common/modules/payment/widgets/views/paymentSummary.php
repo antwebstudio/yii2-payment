@@ -1,6 +1,6 @@
 <?php 
 use yii\helpers\Html;
-use ant\payment\models\Payment;
+use common\modules\payment\models\Payment;
 ?>
 <div class="panel panel-default">
 <div class="panel-heading">Payment Details</div>

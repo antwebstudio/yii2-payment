@@ -3,8 +3,14 @@ namespace ant\payment\components;
 
 use Yii;
 use yii\helpers\Url;
+use ant\payment\models\Invoice;
+use ant\payment\models\Billable;
+use ant\payment\events\PaymentEvent;
 
 class PaymentComponent extends \yii\base\Component {
+	const EVENT_PAYMENT_SUCCESS = 'paymentSuccess';
+	const EVENT_PAYMENT_ERROR = 'paymentError';
+	
 	const SESSION_PAYMENT_SUCCESS_URL = 'paymentSuccessUrl';
 	const SESSION_PAYMENT_URL = 'paymentUrl';
 	
@@ -24,6 +30,97 @@ class PaymentComponent extends \yii\base\Component {
 	protected function getPaymentMethodNames() {
 		return array_keys($this->paymentMethodConfigs);
 	}
+
+    protected function handleResponse($paymentMethod, $response, $payable, $backend = false)
+    {
+		if ($response->isRedirect()) {
+            // redirect to offsite payment gateway
+            $response->redirect();
+		} elseif ($response->isSuccessful()) {
+            $this->onPaymentSuccessful($paymentMethod, $payable, $response, $backend);
+			return true;
+		} else {
+			// payment failed: display message to customer
+			$this->onPaymentError($paymentMethod, $response, $payable);
+			return false;
+		}
+	}
+
+    protected function onPaymentSuccessful($paymentMethod, $payable, $response, $backend = false)
+    {
+		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
+		
+		if (!isset($payment)) {
+			$invoice = $this->getInvoice($payable);
+			//throw new \Exception(isset($payable->invoice) ? $payable->invoice->id : 'no');
+			
+			$payment = $paymentMethod->paymentRecord;
+			$payment->invoice_id = $invoice->id;
+			// $payment->data = \Yii::$app->request->post(); // Some data of payment gateway cannot get from $_POST
+			
+			if ($backend) $payment->backend_update = 1;
+
+			
+			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
+		}
+        $payable->pay($payment->amount);
+		
+		$this->trigger(self::EVENT_PAYMENT_SUCCESS, new PaymentEvent([
+			'payable' => $payable,
+			'response' => $response,
+		]));
+	}
+
+    protected function onPaymentError($paymentMethod, $response, $payable)
+    {
+		
+		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
+		
+		if (!isset($payment)) {
+			$invoice = $this->getInvoice($payable);
+			$payment = $paymentMethod->paymentRecord;
+			$payment->invoice_id = $invoice->id;
+			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.(YII_DEBUG ? Html::errorSummary($payment).print_r($payment,1) : ''));
+
+			// Customer Cancel Transaction will also come to this action, hence should not throw exception.
+		}
+		
+		$this->trigger(self::EVENT_PAYMENT_ERROR, new PaymentEvent([
+			'payable' => $payable,
+			'response' => $response,
+		]));
+		//throw new Yii\web\HttpException(500, $response->getMessage());
+    }
+	
+	public function completePaymentFromBackend($paymentMethod, $payable) {
+		$response = $paymentMethod->completePurchase($paymentMethod->getPaymentDataForGateway($payable));
+
+		$return = $this->handleResponse($paymentMethod, $response, $payable, true);
+		
+		if ($response->isSuccessful()) die('RECEIVEOK');
+		
+		return $response;
+	}
+	
+	public function completePayment($paymentMethod, $payable) {
+		$response = $paymentMethod->completePurchase($paymentMethod->getPaymentDataForGateway($payable));
+
+		$return = $this->handleResponse($paymentMethod, $response, $payable);
+		
+		return $response;
+	}
+	
+	public function pay($paymentMethod, $payable) {
+		$transaction = Yii::$app->db->beginTransaction();
+		// Payment gateway
+		$response = $paymentMethod->purchase($paymentMethod->getPaymentDataForGateway($payable));
+
+		$return = $this->handleResponse($paymentMethod, $response, $payable);
+
+		$transaction->commit();
+		
+		return $response;
+	}
 	
 	public function getAllPaymentMethodFor($model, $includedDisabled = false) {
 		$configs = $this->paymentMethodConfigs;
@@ -42,7 +139,22 @@ class PaymentComponent extends \yii\base\Component {
 		return $enabledPaymentMethods;
 	}
 	
+	public function getInvoice($payable) {
+		// TODO: try to generalize this using payable interface
+        if($payable instanceof Invoice) {
+            return $payable;
+		} else if(isset($payable->invoice)) {
+			return $payable->invoice;
+        } else if($payable instanceof Billable) {
+            return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
+        } else {
+			throw new \Exception('Not able to create invoice. ');
+		}
+	}
+	
 	public function getPaymentMethod($name) {
+		$name = strlen($name) ? $name : 'ipay88';
+		
 		if (!isset($this->_paymentMethod[$name])) {
 			$config = $this->paymentMethodConfigs[$name];
 			$config['name'] = $name;
@@ -65,35 +177,45 @@ class PaymentComponent extends \yii\base\Component {
 		return '/payment/default/complete-payment';
 	}
 	
-	public function getPaymentErrorUrl($payableModel) {
+	public function getPaymentErrorUrl($payable) {
 		if (is_callable($this->errorUrl)) {
-			return call_user_func_array($this->errorUrl, [$payableModel]);
+			return call_user_func_array($this->errorUrl, [$payable]);
 		} else if (isset($this->errorUrl)) {
 			return $this->errorUrl;
 		} else {
-			return $payableModel->privateRoute;
+			return $payable->privateRoute;
 		}
 	}
 	
 	public function setPaymentSuccessUrl($url) {
-		return \Yii::$app->session->set(self::SESSION_PAYMENT_SUCCESS_URL, $url);
+		if (is_callable($url)) {
+			$this->successUrl = $url;
+			// Session not accept callable closure.
+		} else {
+			return \Yii::$app->session->set(self::SESSION_PAYMENT_SUCCESS_URL, $url);
+		}
 	}
 	
-	public function getPaymentSuccessUrl($payableModel) {
+	public function getPaymentSuccessUrl($payable) {
 		if (is_callable($this->successUrl)) {
-			return call_user_func_array($this->successUrl, [$payableModel]);
+			return call_user_func_array($this->successUrl, [$payable]);
 		} else {
-			return \Yii::$app->session->get(self::SESSION_PAYMENT_SUCCESS_URL, isset($this->successUrl) ? $this->successUrl : $payableModel->privateRoute);
+			return \Yii::$app->session->get(self::SESSION_PAYMENT_SUCCESS_URL, isset($this->successUrl) ? $this->successUrl : $payable->privateRoute);
 		}
 	}
 	
 	public function setPaymentCancelUrl($url) {
-		return \Yii::$app->session->set(self::SESSION_PAYMENT_URL, $url);
+		if (is_callable($url)) {
+			$this->cancelUrl = $url;
+			// Session not accept callable closure.
+		} else {
+			return \Yii::$app->session->set(self::SESSION_PAYMENT_URL, $url);
+		}
 	}
 	
-	public function getPaymentCancelUrl($payableModel) {
+	public function getPaymentCancelUrl($payable) {
 		if (is_callable($this->cancelUrl)) {
-			return call_user_func_array($this->cancelUrl, [$payableModel]);
+			return call_user_func_array($this->cancelUrl, [$payable]);
 		} else {
 			return \Yii::$app->session->get(self::SESSION_PAYMENT_URL, $this->cancelUrl);
 		}

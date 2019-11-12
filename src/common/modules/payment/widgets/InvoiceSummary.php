@@ -87,13 +87,6 @@ class InvoiceSummary extends Widget{
 		],
 		'paidAmount', 'dueAmount',
 	];
-	
-	public function init()
-	{
-		if (YII_DEBUG) throw new \Exception('DEPRECATED');
-		
-        parent::init();
-	}
 
 	public function run(){	
 

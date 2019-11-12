@@ -3,25 +3,14 @@
 namespace ant\payment\controllers;
 
 use Yii;
-use yii\web\Controller;
-use yii\helpers\Url;
-use yii\helpers\Html;
-use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 
-use ant\payment\models\Payable;
-use ant\payment\models\Billable;
-use ant\payment\models\PayableItem;
-
-use ant\payment\models\Order;
-use ant\payment\components\PayPalExpressGateway;
-use ant\payment\components\IPay88Gateway;
-use ant\payment\models\Invoice;
-use ant\payment\models\InvoiceItem;
+use ant\payment\components\PaymentComponent;
 
 /**
  * Default controller for the `payment` module
  */
-class DefaultController extends Controller
+class DefaultController extends \yii\web\Controller
 {
 	public $enableCsrfValidation = false;
 
@@ -34,154 +23,107 @@ class DefaultController extends Controller
         return $this->render('index');
     }
 
-    public function actionPay($payId, $type = false, $payMethod = false, $cancelUrl = '')
+    public function actionPay($payId, $type, $payMethod = null, $cancelUrl = '')
     {
-		if (!isset(\Yii::$app->payment)) throw new \Exception('Payment component is not setup. Please setup using ant\payment\components\PaymentComponent.');		
+		$this->checkComponent();
 		
-		$payableModel = $this->getPayableModel($type, $payId);
+		$payable = $this->getPayableModel($type, $payId);
+		$gateway = $this->getPaymentMethod($payMethod, $payable);
 		
-		if ($payableModel instanceof \ant\interfaces\Expirable && $payableModel->isExpired) throw new \Exception('The payable is expired. ');
-		
-		\Yii::$app->payment->setCancelUrl($cancelUrl);
+		Yii::$app->payment->setCancelUrl($cancelUrl);
 
-        if (!$payableModel->isPaid) {
-            if (!$payableModel->isFree) {
-				$transaction = Yii::$app->db->beginTransaction();
-                // Payment gateway
-                $gateway = $this->getPaymentMethod($payMethod, $payableModel);
-                $response = $gateway->purchase($gateway->getPaymentDataForGateway($payableModel));
-
-				$return = $this->handleResponse($gateway, $response, $payableModel);
-
-				$transaction->commit();
-				return $return;
-            } else {
-				if (!$payableModel->markAsPaid() || !$payableModel->isPaid) throw new \Exception('Failed to mark order as paid. ');
-
-				return $this->redirect($this->module->getPaymentSuccessUrl($payableModel));
+        if (!$payable->isPaid) {
+            if (!$payable->isFree) {
 				
+				$response = Yii::$app->payment->pay($gateway, $payable);
+				
+				if ($response->isSuccessful()) {
+					return $this->onPaid($payable);
+				} else {
+					return $this->onError($payable, $response);
+				}
+            } else {
+				if (!$payable->markAsPaid() || !$payable->isPaid) throw new \Exception('Failed to mark payable as paid. ');
+
+				return $this->redirect($this->module->getPaymentSuccessUrl($payable));
             }
         } else {
 			// Already paid
-			return $this->onPaid($payableModel);
+			return $this->onPaid($payable);
         }
     }
 
-    public function actionCompletePayment($payId, $type = false, $payMethod = false, $cancelUrl = '', $backend = false)
+    public function actionCompletePayment($payId, $type, $payMethod = null, $cancelUrl = '', $backend = false)
     {
-		if ($backend) \Yii::$app->session->close();
+		$this->checkComponent();
 		
-        $payableModel = $this->getPayableModel($type, $payId);
+		if ($backend) Yii::$app->session->close();
 		
-		\Yii::$app->payment->setCancelUrl($cancelUrl);
+        $payable = $this->getPayableModel($type, $payId);
+		$gateway = $this->getPaymentMethod($payMethod, $payable);
+		
+		Yii::$app->payment->setCancelUrl($cancelUrl);
 
-        //$invoice = $this->getInvoice($payableModel);
+		if (!$payable->isPaid) {
 
-		//if (!isset($invoice)) throw new \Exception('Invalid Invoice.');
-
-		if (!$payableModel->isPaid) {
-			$gateway = $this->getPaymentMethod($payMethod, $payableModel);
-
-			$response = $gateway->completePurchase($gateway->getPaymentDataForGateway($payableModel));
-
-			$return = $this->handleResponse($gateway, $response, $payableModel, $backend);
+			if ($backend) {
+				$response = Yii::$app->payment->completePaymentFromBackend($gateway, $payable);
+			} else {
+				$response = Yii::$app->payment->completePayment($gateway, $payable);
+			}
 			
-			if ($backend && $response->isSuccessful()) die('RECEIVEOK');
-			
-			return $return;
+			if ($response->isSuccessful()) {
+				return $this->onPaid($payable);
+			} else {
+				return $this->onError($payable, $response);
+			}
 		} else {
 			// Invoice paid
-			return $this->onPaid($payableModel);
+			return $this->onPaid($payable);
 		}
 	}
-
-    protected function handleResponse($gateway, $response, $payableModel, $backend = false)
-    {
-		if ($response->isRedirect()) {
-            // redirect to offsite payment gateway
-            $response->redirect();
-		} elseif ($response->isSuccessful()) {
-            return $this->onPaymentSuccessful($gateway, $payableModel, $backend);
-		} else {
-			// payment failed: display message to customer
-			return $this->onPaymentError($gateway, $response, $payableModel);
+	
+	protected function checkComponent() {
+		if (!isset(Yii::$app->payment)) {
+			throw new \Exception('Payment component is not setup. Please setup using ant\payment\components\PaymentComponent.');		
 		}
 	}
+	
+	protected function onError($payable, $response) {
+		return $this->render('payment-error', [
+			'response' => $response, 
+			'url' => $this->module->getPaymentErrorUrl($payable)
+		]);
+	}
 
-    protected function onPaymentError($gateway, $response, $payableModel)
+    protected function onPaid($payable)
     {
-		
-		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $gateway->paymentRecord->transaction_id]);
-		
-		if (!isset($payment)) {
-			$invoice = $this->getInvoice($payableModel);
-			$payment = $gateway->paymentRecord;
-			$payment->invoice_id = $invoice->id;
-			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.(YII_DEBUG ? Html::errorSummary($payment).print_r($payment,1) : ''));
-
-			// Customer Cancel Transaction will also come to this action, hence should not throw exception.
-		}
-		return $this->render('payment-error', ['response' => $response, 'url' => $this->module->getPaymentErrorUrl($payableModel)]);
-		
-		//throw new \yii\web\HttpException(500, $response->getMessage());
-    }
-
-    protected function onPaid($payableModel)
-    {
-		if (!$payableModel->isPaid) throw new \Exception('Payment failed for unknown reason. ');
+		if (!$payable->isPaid) throw new \Exception('Payment failed for unknown reason. ');
 		
 		// Aware that invoice maybe already marked as paid by a backend url call when the web browser is redirected back to event.my after payment.
 		// Hence if we just render invoice paid message, it will be weird as "Invoice is already paid" message will show, and "Payment succesful" message will never shown.
-		return $this->redirect($this->module->getPaymentSuccessUrl($payableModel));
+		return $this->redirect($this->module->getPaymentSuccessUrl($payable));
 	}
 
-    protected function onPaymentSuccessful($gateway, $payableModel, $backend = false)
+    protected function getPaymentMethod($type, $payable)
     {
-		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $gateway->paymentRecord->transaction_id]);
+		$gateway = Yii::$app->payment->getPaymentMethod($type);
 		
-		if (!isset($payment)) {
-			$invoice = $this->getInvoice($payableModel);
-			$payment = $gateway->paymentRecord;
-			$payment->invoice_id = $invoice->id;
-			// $payment->data = \Yii::$app->request->post(); // Some data of payment gateway cannot get from $_POST
-			
-			if ($backend) $payment->backend_update = 1;
-
-			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.(YII_DEBUG ? Html::errorSummary($payment) : ''));
+		if (!isset($gateway) || !$gateway->isEnabledFor($payable)) {
+			throw new \Exception('Payment method "'.$type.'" is not exist or not allowed. ');
 		}
-        $payableModel->pay($payment->amount);
-		
-        return $this->onPaid($payableModel);
-	}
-
-    protected function getPaymentMethod($type, $payableModel)
-    {
-		$type = strlen($type) ? $type : 'ipay88';
-		$gateway = \Yii::$app->payment->getPaymentMethod($type);
-		if (!$gateway->isEnabledFor($payableModel)) throw new \Exception('Payment method "'.$type.'" is not allowed. ');
 		
 		return $gateway;
     }
 
     protected function getPayableModel($type, $payId)
     {
-		$payableModel = $this->module->getPayableModel($type, $payId);
+		$payable = Yii::$app->payment->getPayableModel($type, $payId);
 		
-		if(!isset($payableModel)) {
-			throw new HttpException(404, YII_DEBUG ? 'Payable model not found' : 'Page not found');
+		if(!isset($payable) || ($payable instanceof \ant\interfaces\Expirable && $payable->isExpired)) {
+			throw new NotFoundHttpException(404, 'Page not found or expired. ');
 		}
-		return $payableModel;
-    }
-
-    protected function getInvoice($payableModel)
-    {
-		// TODO: try to generalize this using payable interface
-        if($payableModel instanceof Invoice) {
-            return $payableModel;
-		} else if(isset($payableModel->invoice)) {
-			return $payableModel->invoice;
-        } else if($payableModel instanceof Billable) {
-            return Invoice::createFromBillableModel($payableModel, Yii::$app->user->identity);
-        }
+		
+		return $payable;
     }
 }

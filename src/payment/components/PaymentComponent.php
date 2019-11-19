@@ -4,7 +4,8 @@ namespace ant\payment\components;
 use Yii;
 use yii\helpers\Url;
 use ant\payment\models\Invoice;
-use ant\payment\models\Billable;
+use ant\payment\interfaces\Payable;
+//use ant\payment\models\Billable;
 use ant\payment\events\PaymentEvent;
 
 class PaymentComponent extends \yii\base\Component {
@@ -33,28 +34,32 @@ class PaymentComponent extends \yii\base\Component {
 
     protected function handleResponse($paymentMethod, $response, $payable, $backend = false)
     {
-		if ($response->isRedirect()) {
-            // redirect to offsite payment gateway
-            $response->redirect();
-		} elseif ($response->isSuccessful()) {
-            $this->onPaymentSuccessful($paymentMethod, $payable, $response, $backend);
-			return true;
-		} else {
-			// payment failed: display message to customer
-			$this->onPaymentError($paymentMethod, $response, $payable);
-			return false;
+		//$transaction = Yii::$app->db->beginTransaction();
+		try {			
+			if ($response->isRedirect()) {
+				// redirect to offsite payment gateway
+				$response->redirect();
+			} elseif ($response->isSuccessful()) {
+				$this->onPaymentSuccessful($paymentMethod, $payable, $response, $backend);
+				return true;
+			} else {
+				// payment failed: display message to customer
+				$this->onPaymentError($paymentMethod, $response, $payable);
+				return false;
+			}
+			//$transaction->commit();
+		} catch (\Exception $ex) {
+			//$transaction->rollback();
+			throw $ex;
 		}
 	}
-
-    protected function onPaymentSuccessful($paymentMethod, $payable, $response, $backend = false)
-    {
+	
+	protected function createPaymentRecord($paymentMethod, $payable, $invoice, $backend = false) {
 		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
 		
 		if (!isset($payment)) {
-			$invoice = $this->getInvoice($payable);
-			//throw new \Exception(isset($payable->invoice) ? $payable->invoice->id : 'no');
-			
 			$payment = $paymentMethod->paymentRecord;
+			//throw new \Exception(isset($payable->invoice) ? $payable->invoice->id : 'no');
 			$payment->invoice_id = $invoice->id;
 			// $payment->data = \Yii::$app->request->post(); // Some data of payment gateway cannot get from $_POST
 			
@@ -63,11 +68,22 @@ class PaymentComponent extends \yii\base\Component {
 			
 			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
 		}
-        $payable->pay($payment->amount);
+		return $payment;
+	}
+
+    protected function onPaymentSuccessful($paymentMethod, $payable, $response, $backend = false)
+    {
+		$invoice = $this->getInvoice($payable);
+		$payment = $this->createPaymentRecord($paymentMethod, $payable, $invoice, $backend);
+        //$payable->pay($payment->amount);
+		$invoice->pay($payment->amount);
+		
+		$payable->trigger(Payable::EVENT_AFTER_PAYMENT_SUCCESS);
 		
 		$this->trigger(self::EVENT_PAYMENT_SUCCESS, new PaymentEvent([
 			'payable' => $payable,
 			'response' => $response,
+			'invoice' => $invoice,
 		]));
 	}
 
@@ -80,7 +96,7 @@ class PaymentComponent extends \yii\base\Component {
 			$invoice = $this->getInvoice($payable);
 			$payment = $paymentMethod->paymentRecord;
 			$payment->invoice_id = $invoice->id;
-			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.(YII_DEBUG ? Html::errorSummary($payment).print_r($payment,1) : ''));
+			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
 
 			// Customer Cancel Transaction will also come to this action, hence should not throw exception.
 		}
@@ -88,6 +104,7 @@ class PaymentComponent extends \yii\base\Component {
 		$this->trigger(self::EVENT_PAYMENT_ERROR, new PaymentEvent([
 			'payable' => $payable,
 			'response' => $response,
+			'invoice' => $invoice,
 		]));
 		//throw new Yii\web\HttpException(500, $response->getMessage());
     }
@@ -145,7 +162,10 @@ class PaymentComponent extends \yii\base\Component {
             return $payable;
 		} else if(isset($payable->invoice)) {
 			return $payable->invoice;
-        } else if($payable instanceof Billable) {
+        } else if($payable instanceof \ant\payment\models\Billable) {
+			if (YII_DEBUG) throw new \Exception('Use ant\payment\interfaces\Billable instead. ');
+            return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
+        } else if($payable instanceof \ant\payment\interfaces\Billable) {
             return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
         } else {
 			throw new \Exception('Not able to create invoice. ');

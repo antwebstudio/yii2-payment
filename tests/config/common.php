@@ -1,4 +1,5 @@
 <?php
+
 return [
 	'id' => 'app-test',
 	'basePath' => dirname(__DIR__),
@@ -12,6 +13,54 @@ return [
         '@common/rbac/views' => '@vendor/inspirenmy/yii2-core/src/common/rbac/views',
 	],
     'components' => [
+		'payment' => [
+			'class' => 'ant\payment\components\PaymentComponent',
+			'paymentGateway' => [
+                'ipay88' => [
+					'class' => 'ant\payment\components\IPay88PaymentMethod',
+					'config' => [
+						'merchantCode' => 'M09111',
+						'merchantKey' => 'tFgrFE0vUR',
+						'sandboxUrl' => ['/sandbox', 'sandbox' => 'ipay88'],
+						'sandboxRequeryUrl' => ['/sandbox', 'sandbox' => 'ipay88', 'requery' => 1],
+						'requeryNeeded' => false,
+					],
+					'overrideMethods' => [
+						'getPaymentDataForGateway' => function($payable, $paymentGateway) {
+							$paymentId = 2;
+							
+							$returnUrl = \Yii::$app->payment->getReturnUrl($paymentGateway->name);
+							$cancelUrl = \Yii::$app->payment->getCancelUrl($paymentGateway->name);
+
+							$cancelUrlParams = $returnUrlParams = \Yii::$app->request->get();
+							array_unshift($returnUrlParams, $returnUrl);
+							array_unshift($cancelUrlParams, $cancelUrl);
+							$backendUrlParams = $returnUrlParams;
+							$backendUrlParams['backend']  = 1;
+							
+							return [
+								'amount' => $payable->getDueAmount(),
+								'currency' => $payable->getCurrency(),
+								'expires_in' =>  time() + 10,
+								'card' => [
+									'billingName' => 'test', // $payableModel->billedTo->contactName,
+									'email' => 'test@example.com', // $payableModel->billedTo->email,
+									'number' => '01640612345', // $payableModel->billedTo->contact_number,
+								],
+								'paymentId' => $paymentId,
+								'description' => 'Event Registration Fee',
+								'transactionId' => $payable->getReference(),
+								// 'card' => $formData,
+
+								'returnUrl' => 'localhost',
+								'cancelUrl' => '',
+								'backendUrl' => '',
+							];
+						},
+					],
+                ],
+			],
+		],
         'i18n' => [
             'translations' => [
                 '*'=> [

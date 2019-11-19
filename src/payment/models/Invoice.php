@@ -60,7 +60,7 @@ class Invoice extends ActiveRecord implements Payable
 			],
 			'timestamp' => [
 				'class' => \ant\behaviors\DateTimeAttributeBehavior::className(),
-				'attributes' => ['issue_date'],
+				//'attributes' => ['issue_date'],
 			],
 			'formattedAutoColumn' => [
 				'class' => \ant\behaviors\FormattedAutoIncreaseColumnBehavior::className(),
@@ -437,7 +437,7 @@ class Invoice extends ActiveRecord implements Payable
 		return $invoice;
 	}
 	
-	public static function createFromBillableModel($payableModel, $billTo = null) {
+	public static function createFromBillableModel($payable, $billTo = null) {
 		if (YII_DEBUG) {
 			if (isset($billTo)) {
 				if (!($billTo instanceof User) && !($billTo instanceof Contact)) {
@@ -460,11 +460,11 @@ class Invoice extends ActiveRecord implements Payable
 		$transaction = Yii::$app->db->beginTransaction();
 		// Create invoice
 		$invoice = new Invoice([
-			'total_amount' => $payableModel->getNetTotal(),
-			'discount_amount' => $payableModel->getDiscountAmount(),
-			'absorbed_service_charges' => $payableModel->getAbsorbedServiceCharges(),
-			'service_charges_amount' => $payableModel->getServiceCharges(),
-			'tax_amount' => $payableModel->getTaxCharges(),
+			'total_amount' => $payable->getNetTotal(),
+			'discount_amount' => $payable->getDiscountAmount(),
+			'absorbed_service_charges' => $payable->getAbsorbedServiceCharges(),
+			'service_charges_amount' => $payable->getServiceCharges(),
+			'tax_amount' => $payable->getTaxCharges(),
 			'status' => Invoice::STATUS_ACTIVE,
 			'billed_to' => $contactId,
 		]);
@@ -487,7 +487,7 @@ class Invoice extends ActiveRecord implements Payable
 		}
 
 		// Create invoice items
-		foreach ($payableModel->billItems as $item)
+		foreach ($payable->getBillItems() as $item)
 		{
 			if(!($item instanceof BillableItem)) {
 				throw new \Exception('Invalid Billable Item. ('.get_class($item).')');
@@ -495,11 +495,11 @@ class Invoice extends ActiveRecord implements Payable
 			}
 
 			$invoiceItem = new InvoiceItem();
-			$invoiceItem->item_id = $item->id;
-			$invoiceItem->title = $item->title;
-			$invoiceItem->quantity = $item->quantity;
-			$invoiceItem->unit_price = $item->unitPrice;
-			$invoiceItem->description = $item->description;
+			$invoiceItem->item_id = $item->getId();
+			$invoiceItem->title = $item->getTitle();
+			$invoiceItem->quantity = $item->getQuantity();
+			$invoiceItem->unit_price = $item->getUnitPrice();
+			$invoiceItem->description = $item->getDescription();
 			$invoiceItem->included_in_subtotal = $item->getIncludedInSubtotal() ? 1 : 0;
 			$invoiceItem->setDiscount($item->getDiscount());
 			
@@ -521,7 +521,7 @@ class Invoice extends ActiveRecord implements Payable
 
 		$transaction->commit();
 
-		$payableModel->trigger(Billable::EVENT_AFTER_BILL_SUCCESS, new \yii\base\Event(['sender' => $invoice]));
+		$payable->trigger(Billable::EVENT_AFTER_BILL_SUCCESS, new \yii\base\Event(['sender' => $invoice]));
 		
 		return $invoice;
 	}

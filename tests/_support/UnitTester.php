@@ -47,16 +47,22 @@ class UnitTester extends \Codeception\Actor
 		return $property->setValue($object, $value);
 	}
 	
-	public function renderDbTable($name) {
-		$rows = Yii::$app->db->createCommand('SHOW FULL COLUMNS FROM '.$name)->queryAll();
-		$columns = [];
-		foreach ($rows as $r) {
-			$columns[] = $r['Field'];
+	public function renderDbTable($name, $select = null) {
+		
+		$query = (new \yii\db\Query)->from($name);
+		if (isset($select)) {
+			$query->select($select);
+			$columns = is_array($select) ? $select : explode(',', str_replace(' ', '', $select));
+		} else {			
+			$rows = Yii::$app->db->createCommand('SHOW FULL COLUMNS FROM '.$name)->queryAll();
+			$columns = [];
+			foreach ($rows as $r) {
+				$columns[] = $r['Field'];
+			}
 		}
+		$rows = $query->all();
 		
-		$rows = (new \yii\db\Query)->from($name)->all();
-		
-		return "\n".Table::widget([
+		return "\n".$name."\n".Table::widget([
 			'headers' => $columns,
 			'rows' => $rows,
 			'screenWidth' => 120,

@@ -9,4 +9,6 @@ class PaymentEvent extends \yii\base\Event {
     public $payable;
 	
 	public $response;
+	
+	public $invoice;
 }

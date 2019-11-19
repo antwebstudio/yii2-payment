@@ -97,9 +97,16 @@ class PaymentComponentCest
 		$countPayment = Payment::find()->count();
 		
 		$payable = new TestPayableWithException;
+		if (!$payable->save()) throw new \Exception(print_r($payable->errors, 1));
 		$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable);
 		
 		$exceptionThrown = false;
+		try {
+			$response = Yii::$app->payment->completePayment($gateway, $payable);
+		} catch (\Exception $ex) {
+			$exceptionThrown = true;
+		}
+		
 		try {
 			$response = Yii::$app->payment->completePayment($gateway, $payable);
 		} catch (\Exception $ex) {
@@ -116,6 +123,7 @@ class PaymentComponentCest
 	
 	protected function getPayable() {
 		$payable = new TestPayable;
+		if (!$payable->save()) throw new \Exception(print_r($payable->errors, 1));
 		return $payable;
 	}
 }
@@ -158,8 +166,14 @@ class TestPayableItem extends \yii\base\Component implements BillableItem {
 	}
 }
 
-class TestPayable extends \yii\base\Component implements Payable, Billable {
+class TestPayable extends \yii\db\ActiveRecord implements Payable, Billable {
+	use \ant\payment\traits\BillableActiveRecordTrait;
+	
 	public $paid = false;
+	
+	public static function tableName() {
+		return '{{%test_payable}}';
+	}
 	
 	public function behaviors() {
 		return [

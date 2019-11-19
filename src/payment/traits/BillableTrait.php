@@ -4,6 +4,10 @@ namespace ant\payment\traits;
 use ant\helpers\Currency;
 
 trait BillableTrait {
+	public function billTo($userId = null) {
+		return Invoice::createFromBillableModel($this, $userId);
+	}
+	
 	public function getNetTotal() {
 		return Currency::rounding($this->getDiscountedUnitPrice() * $this->getQuantity());
 	}

@@ -121,7 +121,7 @@ class DefaultController extends \yii\web\Controller
 		$payable = Yii::$app->payment->getPayableModel($type, $payId);
 		
 		if(!isset($payable) || ($payable instanceof \ant\interfaces\Expirable && $payable->isExpired)) {
-			throw new NotFoundHttpException(404, 'Page not found or expired. ');
+			throw new NotFoundHttpException('Page not found or expired. ');
 		}
 		
 		return $payable;

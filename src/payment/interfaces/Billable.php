@@ -5,6 +5,8 @@ interface Billable
 {
 	const EVENT_AFTER_BILL_SUCCESS = 'afterBillSuccess';
 	
+	public function billTo($userId);
+	
 	public function getDiscountAmount();
     
     public function getAbsorbedServiceCharges();

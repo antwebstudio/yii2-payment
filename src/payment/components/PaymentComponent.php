@@ -166,7 +166,7 @@ class PaymentComponent extends \yii\base\Component {
 			if (YII_DEBUG) throw new \Exception('Use ant\payment\interfaces\Billable instead. ');
             return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
         } else if($payable instanceof \ant\payment\interfaces\Billable) {
-            return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
+            return $payable->billTo(Yii::$app->user->identity);
         } else {
 			throw new \Exception('Not able to create invoice. ');
 		}
@@ -262,7 +262,7 @@ class PaymentComponent extends \yii\base\Component {
 			throw new \Exception('Payable model type "'.$payType.'" not defined. ');
 		}
 		
-        return ($payable && (new $payable instanceof \ant\payment\models\Payable)) ? $payable : false;
+        return ($payable && (new $payable instanceof \ant\payment\interfaces\Payable)) ? $payable : false;
     }
 
 	protected function getExtraPayOptions()

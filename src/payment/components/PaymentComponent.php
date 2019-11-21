@@ -58,9 +58,19 @@ class PaymentComponent extends \yii\base\Component {
 		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
 		
 		if (!isset($payment)) {
-			$payment = $paymentMethod->paymentRecord;
-			if ($backend) $payment->backend_update = 1;
-			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
+			$mutex = Yii::$app->mutex;
+			$mutexName = 'payment-'.$paymentMethod->paymentRecord->transaction_id;
+			
+			if ($mutex->acquire($mutexName)) {
+				$payment = $paymentMethod->paymentRecord;
+				if ($backend) $payment->backend_update = 1;
+				if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
+				
+				//$mutex->release($mutexName);
+			} else {
+				sleep(1);
+				$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend);
+			}
 		}
 		return $payment;
 	}
@@ -159,13 +169,23 @@ class PaymentComponent extends \yii\base\Component {
 			if (YII_DEBUG) throw new \Exception('Use ant\payment\interfaces\Billable instead. ');
             return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
         } else if($payable instanceof \ant\payment\interfaces\Billable) {
-			$transaction = Yii::$app->db->beginTransaction();
-			try {
-				$invoice = $payable->billTo(Yii::$app->user->identity);
-				$transaction->commit();
-			} catch (\Exception $ex) {
-				$transaction->rollback();
-				throw $ex;
+			$mutex = Yii::$app->mutex;
+			$mutexName = 'orderInvoice-'.$payable->id;
+			
+			if ($mutex->acquire($mutexName)) {
+				$transaction = Yii::$app->db->beginTransaction();
+				try {
+					$invoice = $payable->billTo(Yii::$app->user->identity);
+					$transaction->commit();
+				} catch (\Exception $ex) {
+					$mutex->release($mutexName);
+					$transaction->rollback();
+					throw $ex;
+				}
+			} else {
+				sleep(1);
+				$payable->refresh();
+				$invoice = $this->getInvoice($payable);
 			}
             return $invoice;
         } else {

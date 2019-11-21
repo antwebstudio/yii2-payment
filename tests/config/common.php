@@ -13,6 +13,9 @@ return [
         '@common/rbac/views' => '@vendor/inspirenmy/yii2-core/src/common/rbac/views',
 	],
     'components' => [
+        'mutex' => [
+            'class' => 'yii\mutex\MysqlMutex',
+        ],
 		'payment' => [
 			'class' => 'ant\payment\components\PaymentComponent',
 			'paymentGateway' => [

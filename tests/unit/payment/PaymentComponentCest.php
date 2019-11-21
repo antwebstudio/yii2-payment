@@ -71,9 +71,11 @@ class PaymentComponentCest
 		
 		$payable = $this->getPayable();
 		$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable);
+		$response = Yii::$app->payment->completePayment($gateway, $payable);
 		
-		$response = Yii::$app->payment->completePayment($gateway, $payable);
-		$response = Yii::$app->payment->completePayment($gateway, $payable);
+		//$payable = $this->getPayable();
+		//$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable);
+		//$response = Yii::$app->payment->completePayment($gateway, $payable);
 		
 		$invoice = Invoice::findOne($invoice->id);
 		

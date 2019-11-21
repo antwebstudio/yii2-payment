@@ -54,27 +54,28 @@ class PaymentComponent extends \yii\base\Component {
 		}
 	}
 	
-	protected function createPaymentRecord($paymentMethod, $payable, $invoice, $backend = false) {
+	protected function ensurePaymentRecord($paymentMethod, $payable, $backend = false) {
 		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
 		
 		if (!isset($payment)) {
 			$payment = $paymentMethod->paymentRecord;
-			//throw new \Exception(isset($payable->invoice) ? $payable->invoice->id : 'no');
-			$payment->invoice_id = $invoice->id;
-			// $payment->data = \Yii::$app->request->post(); // Some data of payment gateway cannot get from $_POST
-			
 			if ($backend) $payment->backend_update = 1;
-
-			
 			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
 		}
 		return $payment;
 	}
+	
+	protected function assignPaymentToInvoice($payment, $invoice) {
+		$payment->invoice_id = $invoice->id;
+		if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
+	}
 
     protected function onPaymentSuccessful($paymentMethod, $payable, $response, $backend = false)
     {
+		$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend);
 		$invoice = $this->getInvoice($payable);
-		$payment = $this->createPaymentRecord($paymentMethod, $payable, $invoice, $backend);
+		$this->assignPaymentToInvoice($payment, $invoice);
+		
         //$payable->pay($payment->amount);
 		$invoice->pay($payment->amount);
 		
@@ -89,17 +90,9 @@ class PaymentComponent extends \yii\base\Component {
 
     protected function onPaymentError($paymentMethod, $response, $payable)
     {
-		
-		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
-		
-		if (!isset($payment)) {
-			$invoice = $this->getInvoice($payable);
-			$payment = $paymentMethod->paymentRecord;
-			$payment->invoice_id = $invoice->id;
-			if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
-
-			// Customer Cancel Transaction will also come to this action, hence should not throw exception.
-		}
+		$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend);
+		$invoice = $this->getInvoice($payable);
+		$this->assignPaymentToInvoice($payment, $invoice);
 		
 		$this->trigger(self::EVENT_PAYMENT_ERROR, new PaymentEvent([
 			'payable' => $payable,
@@ -166,7 +159,15 @@ class PaymentComponent extends \yii\base\Component {
 			if (YII_DEBUG) throw new \Exception('Use ant\payment\interfaces\Billable instead. ');
             return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
         } else if($payable instanceof \ant\payment\interfaces\Billable) {
-            return $payable->billTo(Yii::$app->user->identity);
+			$transaction = Yii::$app->db->beginTransaction();
+			try {
+				$invoice = $payable->billTo(Yii::$app->user->identity);
+				$transaction->commit();
+			} catch (\Exception $ex) {
+				$transaction->rollback();
+				throw $ex;
+			}
+            return $invoice;
         } else {
 			throw new \Exception('Not able to create invoice. ');
 		}

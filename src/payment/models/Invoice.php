@@ -6,7 +6,7 @@ use yii\helpers\Html;
 use yii\db\ActiveRecord;
 
 use ant\helpers\Currency;
-use ant\payment\models\Payable;
+use ant\payment\interfaces\Payable;
 use ant\payment\interfaces\BillableItem;
 use ant\order\models\Order;
 use ant\user\models\User;

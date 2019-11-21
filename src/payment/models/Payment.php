@@ -87,7 +87,7 @@ class Payment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['payment_gateway', 'amount', 'invoice_id', 'currency', 'data', 'status'], 'required'],
+            [['payment_gateway', 'amount', 'currency', 'data', 'status'], 'required'],
             [['amount'], 'number'],
             [['invoice_id', 'status', 'is_valid', 'paid_by'], 'integer'],
             [['attachments', 'paid_at', 'created_at', 'updated_at'], 'safe'],

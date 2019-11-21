@@ -73,6 +73,7 @@ class PaymentComponentCest
 		$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable);
 		
 		$response = Yii::$app->payment->completePayment($gateway, $payable);
+		$response = Yii::$app->payment->completePayment($gateway, $payable);
 		
 		$invoice = Invoice::findOne($invoice->id);
 		
@@ -82,7 +83,46 @@ class PaymentComponentCest
 		$I->assertTrue($payable->paid);
     }
 	
-	public function testCompletePaymentWithException(UnitTester $I)
+	public function testCompletePaymentWithExceptionAtPaymentSuccess(UnitTester $I)
+    {
+		$_POST['PaymentId'] = 2;
+		$_POST['RefNo'] = '2';
+		$_POST['Amount'] = 10;
+		$_POST['Currency'] = 'MYR';
+		$_POST['Status'] = 1;
+		$_POST['Signature'] = 'R36v/5gUqO+exaW80Za4IQpumE8=';
+		$_POST['Remark'] = '';
+		$_POST['TransId'] = 'TEST-1';
+		
+		$count = Invoice::find()->count();
+		$countPayment = Payment::find()->count();
+		
+		$payable = new TestPayableWithException2;
+		if (!$payable->save()) throw new \Exception(print_r($payable->errors, 1));
+		$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable);
+		
+		$exceptionThrown = false;
+		try {
+			$response = Yii::$app->payment->completePayment($gateway, $payable);
+		} catch (\Exception $ex) {
+			$exceptionThrown = true;
+		}
+		
+		try {
+			$response = Yii::$app->payment->completePayment($gateway, $payable);
+		} catch (\Exception $ex) {
+			$exceptionThrown = true;
+		}
+		
+		//throw new \Exception($invoice->id.':'.$invoice->paid_amount.':'.$I->renderDbTable('{{%payment}}', ['transaction_id', 'invoice_id', 'amount']));
+		
+		$I->assertTrue($exceptionThrown);
+		$I->assertEquals($count + 1, Invoice::find()->count());
+		$I->assertEquals($countPayment + 1, Payment::find()->count());
+		//$I->assertTrue($payable->paid);
+    }
+	
+	public function testCompletePaymentWithExceptionAtCreatingInvoice(UnitTester $I)
     {
 		$_POST['PaymentId'] = 2;
 		$_POST['RefNo'] = '2';
@@ -107,15 +147,24 @@ class PaymentComponentCest
 			$exceptionThrown = true;
 		}
 		
+		// Data returned should be recorded even the payment is failed.
+		$I->assertEquals($countPayment + 1, Payment::find()->count());
+		
 		try {
 			$response = Yii::$app->payment->completePayment($gateway, $payable);
 		} catch (\Exception $ex) {
 			$exceptionThrown = true;
 		}
 		
+		$I->setProperty($payable, 'throwException', false);
+		$response = Yii::$app->payment->completePayment($gateway, $payable);
+		
 		//throw new \Exception($invoice->id.':'.$invoice->paid_amount.':'.$I->renderDbTable('{{%payment}}', ['transaction_id', 'invoice_id', 'amount']));
 		
+		$payment = Payment::findOne(['invoice_id' => $payable->invoice->id]);
+		
 		$I->assertTrue($exceptionThrown);
+		$I->assertTrue(isset($payment));
 		$I->assertEquals($count + 1, Invoice::find()->count());
 		$I->assertEquals($countPayment + 1, Payment::find()->count());
 		//$I->assertTrue($payable->paid);
@@ -250,6 +299,17 @@ class TestPayable extends \yii\db\ActiveRecord implements Payable, Billable {
 }
 
 class TestPayableWithException extends TestPayable {
+	protected $throwException = true;
+	
+	public function billTo($userId = null) {
+		$invoice = Invoice::createFromBillableModel($this, $userId);
+		if ($this->throwException) throw new \Exception('Error');
+		$this->link('invoice', $invoice);
+		return $invoice;
+	}
+}
+
+class TestPayableWithException2 extends TestPayable {
 	public function paymentSuccessCallBack() {
 		throw new \Exception('Error');
 	}

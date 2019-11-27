@@ -12,8 +12,10 @@ class PaymentComponent extends \yii\base\Component {
 	const EVENT_PAYMENT_SUCCESS = 'paymentSuccess';
 	const EVENT_PAYMENT_ERROR = 'paymentError';
 	
+	const SESSION_PAYMENT_ERROR_URL = 'paymentErrorUrl';
 	const SESSION_PAYMENT_SUCCESS_URL = 'paymentSuccessUrl';
 	const SESSION_PAYMENT_URL = 'paymentUrl';
+	const SESSION_PAYMENT_SKIP_ERROR_MESSAGE = 'paymentSkipErrorMessage';
 	
 	public $paymentGateway;
 	public $paymentGatewaySandbox;
@@ -165,9 +167,6 @@ class PaymentComponent extends \yii\base\Component {
             return $payable;
 		} else if(isset($payable->invoice)) {
 			return $payable->invoice;
-        } else if($payable instanceof \ant\payment\models\Billable) {
-			if (YII_DEBUG) throw new \Exception('Use ant\payment\interfaces\Billable instead. ');
-            return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
         } else if($payable instanceof \ant\payment\interfaces\Billable) {
 			$mutex = Yii::$app->mutex;
 			$mutexName = 'orderInvoice-'.$payable->id;
@@ -188,6 +187,9 @@ class PaymentComponent extends \yii\base\Component {
 				$invoice = $this->getInvoice($payable);
 			}
             return $invoice;
+        } else if($payable instanceof \ant\payment\models\Billable) {
+			if (YII_DEBUG) throw new \Exception('Use ant\payment\interfaces\Billable instead. ');
+            return Invoice::createFromBillableModel($payable, Yii::$app->user->identity);
         } else {
 			throw new \Exception('Not able to create invoice. ');
 		}
@@ -218,8 +220,30 @@ class PaymentComponent extends \yii\base\Component {
 		return '/payment/default/complete-payment';
 	}
 	
+	protected function setIsShouldSkipErrorMessage($skipErrorMessage = true) {
+		return Yii::$app->session->set(self::SESSION_PAYMENT_SKIP_ERROR_MESSAGE, $skipErrorMessage);
+	}
+	
+	public function getIsShouldSkipErrorMessage() {
+		return Yii::$app->session->get(self::SESSION_PAYMENT_SKIP_ERROR_MESSAGE, false);
+	}
+	
+	public function setPaymentErrorUrl($url, $skipErrorMessage = false) {
+		if (is_callable($url)) {
+			$this->errorUrl = $url;
+			// Session not accept callable closure.
+		} else {
+			$this->errorUrl = $url;
+			$this->setIsShouldSkipErrorMessage($skipErrorMessage);
+			return \Yii::$app->session->set(self::SESSION_PAYMENT_ERROR_URL, $url);
+		}
+	}
+	
 	public function getPaymentErrorUrl($payable) {
-		if (is_callable($this->errorUrl)) {
+		$session = \Yii::$app->session->get(self::SESSION_PAYMENT_ERROR_URL);
+		if ($session) {
+			return $session;
+		} else if (is_callable($this->errorUrl)) {
 			return call_user_func_array($this->errorUrl, [$payable]);
 		} else if (isset($this->errorUrl)) {
 			return $this->errorUrl;
@@ -233,15 +257,21 @@ class PaymentComponent extends \yii\base\Component {
 			$this->successUrl = $url;
 			// Session not accept callable closure.
 		} else {
+			$this->successUrl = $url;
 			return \Yii::$app->session->set(self::SESSION_PAYMENT_SUCCESS_URL, $url);
 		}
 	}
 	
 	public function getPaymentSuccessUrl($payable) {
-		if (is_callable($this->successUrl)) {
+		$session = \Yii::$app->session->get(self::SESSION_PAYMENT_SUCCESS_URL);
+		if ($session) {
+			return $session;
+		} else if (is_callable($this->successUrl)) {
 			return call_user_func_array($this->successUrl, [$payable]);
+		} else if (isset($this->successUrl)) {
+			return $this->successUrl;
 		} else {
-			return \Yii::$app->session->get(self::SESSION_PAYMENT_SUCCESS_URL, isset($this->successUrl) ? $this->successUrl : $payable->privateRoute);
+			return $payable->privateRoute;
 		}
 	}
 	

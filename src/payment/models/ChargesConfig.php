@@ -64,4 +64,12 @@ class ChargesConfig extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Event::className(), ['service_fee' => 'id']);
     }
+
+    public function getFullLabel() {
+        $percentage = $this->percentage ? $this->percentage.'% ' : '';
+        $amount = $this->amount ? 'RM '.$this->amount : '';
+        $plus = $percentage && $amount ? ' + ' : '';
+        
+        return $this->label.' - '.$percentage.$plus.$amount;
+    }
 }

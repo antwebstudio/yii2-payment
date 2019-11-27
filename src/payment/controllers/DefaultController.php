@@ -90,6 +90,9 @@ class DefaultController extends \yii\web\Controller
 	}
 	
 	protected function onError($payable, $response) {
+		if (Yii::$app->payment->getIsShouldSkipErrorMessage()) {
+			return $this->redirect($this->module->getPaymentErrorUrl($payable));
+		}
 		return $this->render('payment-error', [
 			'response' => $response, 
 			'url' => $this->module->getPaymentErrorUrl($payable)

@@ -2,7 +2,7 @@
 
 namespace ant\payment\migrations\db;
 
-use ant\components\Migration;
+use ant\db\Migration;
 
 class M181007112921_create_payment_charges_config extends Migration
 {

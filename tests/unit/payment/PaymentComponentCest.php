@@ -51,6 +51,7 @@ class PaymentComponentCest
 		//throw new \Exception($I->renderDbTable('{{%payment}}', ['transaction_id', 'invoice_id', 'amount']));
 		
 		$I->assertEquals(10, $invoice->paid_amount);
+		$I->assertEquals(10, $invoice->calculatedPaidAmount);
     }
 	
 	public function testCompletePaymentWithNotInvoice(UnitTester $I)
@@ -82,6 +83,7 @@ class PaymentComponentCest
 		//throw new \Exception($invoice->id.':'.$invoice->paid_amount.':'.$I->renderDbTable('{{%payment}}', ['transaction_id', 'invoice_id', 'amount']));
 		
 		$I->assertEquals(10, $invoice->paid_amount);
+		$I->assertEquals(10, $invoice->calculatedPaidAmount);
 		$I->assertTrue($payable->paid);
     }
 	
@@ -170,6 +172,51 @@ class PaymentComponentCest
 		$I->assertEquals($count + 1, Invoice::find()->count());
 		$I->assertEquals($countPayment + 1, Payment::find()->count());
 		//$I->assertTrue($payable->paid);
+    }
+	
+	// First time failed, then success
+	/* 
+		This happended when user make payment and then clicked cancel, this will then caused:
+		- payment is recorded as cancelled
+		- payment success after recorrded cancelled
+	*/
+	public function testCompletePaymentTwiceWithDifferentStatus(UnitTester $I)
+    {
+		$_POST['PaymentId'] = 2;
+		$_POST['RefNo'] = '2';
+		$_POST['Amount'] = 10;
+		$_POST['Currency'] = 'MYR';
+		$_POST['Status'] = 0;
+		$_POST['Signature'] = 'R36v/5gUqO+exaW80Za4IQpumE8=';
+		$_POST['Remark'] = '';
+		$_POST['TransId'] = 'TEST-1';
+		$_POST['ErrDesc'] = 'Test Error';
+		
+		$invoice = null;
+		Yii::$app->payment->on(PaymentComponent::EVENT_PAYMENT_SUCCESS, function($event) use (&$invoice) {
+			$invoice = $event->invoice;
+		});
+		
+		$payable = $this->getPayable();
+		$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable);
+		$response = Yii::$app->payment->completePayment($gateway, $payable);
+		
+		$_POST['Status'] = 1;
+		unset($_POST['ErrDesc']);
+		
+		$I->setProperty(Yii::$app->payment, '_paymentMethod', null); // Reset so that new $_POST value will take effect.
+		
+		$payable = $this->getPayable();
+		$gateway = Yii::$app->payment->getPaymentMethod('ipay88', $payable, true);
+		$response = Yii::$app->payment->completePayment($gateway, $payable);
+		
+		$invoice = Invoice::findOne($invoice->id);
+		
+		//throw new \Exception($invoice->id.':'.$invoice->paid_amount.':'.$I->renderDbTable('{{%payment}}', ['transaction_id', 'invoice_id', 'amount', 'status', 'is_valid']));
+		
+		$I->assertEquals(10, $invoice->paid_amount);
+		$I->assertEquals(10, $invoice->calculatedPaidAmount);
+		$I->assertTrue($payable->paid);
     }
 	
 	protected function getPayable() {

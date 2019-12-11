@@ -2,7 +2,7 @@
 
 namespace ant\payment\migrations\db;
 
-use ant\components\Migration;
+use ant\db\Migration;
 
 /**
  * Class M190815062056AlterPaymentInvoice

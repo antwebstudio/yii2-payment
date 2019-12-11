@@ -46,7 +46,7 @@ class PaymentComponent extends \yii\base\Component {
 				return true;
 			} else {
 				// payment failed: display message to customer
-				$this->onPaymentError($paymentMethod, $response, $payable);
+				$this->onPaymentError($paymentMethod, $response, $payable, $backend);
 				return false;
 			}
 			//$transaction->commit();
@@ -56,12 +56,12 @@ class PaymentComponent extends \yii\base\Component {
 		}
 	}
 	
-	protected function ensurePaymentRecord($paymentMethod, $payable, $backend = false) {
+	protected function ensurePaymentRecord($paymentMethod, $payable, $backend = false, $updateIfExist = true) {
 		$payment = \ant\payment\models\Payment::findOne(['transaction_id' => $paymentMethod->paymentRecord->transaction_id]);
 		
+		$mutexName = 'payment-'.$paymentMethod->paymentRecord->transaction_id;
 		if (!isset($payment)) {
 			$mutex = Yii::$app->mutex;
-			$mutexName = 'payment-'.$paymentMethod->paymentRecord->transaction_id;
 			
 			if ($mutex->acquire($mutexName)) {
 				$payment = $paymentMethod->paymentRecord;
@@ -71,8 +71,24 @@ class PaymentComponent extends \yii\base\Component {
 				//$mutex->release($mutexName);
 			} else {
 				sleep(1);
-				$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend);
+				$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend, $updateIfExist);
 			}
+		} else if ($updateIfExist) {
+			$mutex = Yii::$app->mutex;
+			
+			//if ($mutex->acquire($mutexName)) {
+				$payment->attributes = $paymentMethod->paymentRecord->attributes;
+				$payment->status = $paymentMethod->paymentRecord->status;
+				$payment->is_valid = $paymentMethod->paymentRecord->is_valid;
+				
+				if ($backend) $payment->backend_update = 1;
+				if (!$payment->save()) throw new \Exception('Payment record failed to be saved. '.print_r($payment->errors, 1));
+				
+				//$mutex->release($mutexName);
+			//} else {
+				//sleep(1);
+				//$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend, $updateIfExist);
+			//}
 		}
 		return $payment;
 	}
@@ -100,7 +116,7 @@ class PaymentComponent extends \yii\base\Component {
 		]));
 	}
 
-    protected function onPaymentError($paymentMethod, $response, $payable)
+    protected function onPaymentError($paymentMethod, $response, $payable, $backend)
     {
 		$payment = $this->ensurePaymentRecord($paymentMethod, $payable, $backend);
 		$invoice = $this->getInvoice($payable);

@@ -4,7 +4,7 @@ use ant\payment\models\Invoice;
 use ant\user\models\User;
 ?>
 <?php if ($searchModel->userId): ?>
-    <?= \yii\bootstrap\Nav::widget([
+    <?= \ant\widgets\Nav::widget([
         'options' => [
             'class' => 'nav-tabs',
             'style' => 'margin-bottom: 15px'
@@ -108,7 +108,7 @@ use ant\user\models\User;
 	    // 'contentOptions' => ['class' => 'text-right text-nowrap'],
 	    // ],
 		[
-			'class' => 'yii\grid\ActionColumn',
+			'class' => 'ant\grid\ActionColumn',
 			'headerOptions' => ['class' => 'min-width'],
 			'contentOptions' => ['class' => 'text-right text-nowrap'],
 			'template'=>' {view}',

@@ -14,49 +14,7 @@ class InvoiceSummary extends Widget{
 	public $title = 'Details';
 	public $showSubtotal = true;
 	public $itemsRelation = 'billItems';
-	public $details = [
-		[
-			'attribute' => 'formattedId',
-			'label' => 'Reference',
-		],
-		[
-			'attribute' => 'created_at',
-			'label' => 'Date',
-		],
-		[
-			'attribute' => 'billedTo.contactName',
-			'label' => 'Billing Contact Name',
-		],
-		[
-			'attribute' => 'billedTo.contact_number',
-			'label' => 'Billing Contact Number',
-		],
-		[
-			'attribute' => 'billedTo.email',
-			'label' => 'Billing Contact Email',
-		],
-		[
-			'attribute' => 'billedTo.addressString',
-			'label' => 'Billing Address',
-		],
-		// Invoice don't have shipTo attribute, only order have.
-		/*[
-			'attribute' => 'shipTo.contactName',
-			'label' => 'Shipping Contact Name',
-		],
-		[
-			'attribute' => 'shipTo.contact_number',
-			'label' => 'Shipping Contact Number',
-		],
-		[
-			'attribute' => 'shipTo.email',
-			'label' => 'Shipping Contact Email',
-		],
-		[
-			'attribute' => 'shipTo.addressString',
-			'label' => 'Shipping Address',
-		],*/
-	];
+	public $detail = [];
 	public $columns = [
 		[
 			'attribute' => 'title', 
@@ -148,19 +106,6 @@ class InvoiceSummary extends Widget{
 			'{title}' => $this->title,
 		]);
 	}
-
-	public function renderDetailRow($model, $column) {
-		$html = Html::beginTag('tr');
-		
-		$labelOptions = isset($column['labelOptions']) ? $column['labelOptions'] : ['class' => 'col-md-2 order-detail-label'];
-		$options = isset($column['options']) ? $column['options'] : [];
-		$html .= Html::tag('td', $this->getDataCellLabel($model, $column), $labelOptions);
-		$html .= Html::tag('td', $this->getDataCellValue($model, $column), $options);
-		
-		$html .= Html::endTag('tr');
-		
-		return $html;
-	}
 	
 	public function renderColumnHeader($model, $column) {
 		$options = isset($column['headerOptions']) ? $column['headerOptions'] : [];
@@ -200,6 +145,14 @@ class InvoiceSummary extends Widget{
 		$html .= Html::endTag('tr');
 		
 		return $html;
+	}
+	
+	public function renderDetail() {
+		if ($this->detail !== false) {
+			$options = $this->detail;
+			$options['model'] =  $this->model;
+			return InvoiceDetail::widget($options);
+		}
 	}
 	
 	protected function renderSummaryLabelCellContent($model, $attribute) {

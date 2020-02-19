@@ -104,7 +104,21 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 		return $payment;
 	}
 	
+	public function getPayUrl($payable) {
+		if (get_class($payable) == 'ant\order\models\Order') {
+			$type = 'order';
+		}
+		return Url::to(['/payment/default/pay', 
+			'payId' => $payable->id, 
+			'cancelUrl' => \Yii::$app->payment->getCancelUrl(), 
+			'type' => $type,
+			'payMethod' => $this->name,
+		]);
+	}
+	
 	public function getPaymentUrl($type, $payId) {
+		if (YII_DEBUG) throw new \Exception('DEPRECATED, use getPayUrl'); // 2020-2-14
+		
 		return Url::to(['/payment/default/pay', 
 			'payId' => $payId, 
 			'cancelUrl' => \Yii::$app->payment->getCancelUrl(), 
@@ -128,9 +142,9 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 		$this->_iconUrl = $value;
 	}
 	
-	public function isEnabledFor($payableModel) {
+	public function isEnabledFor($payable) {
 		if (is_callable($this->enabled)) {
-			return call_user_func_array($this->enabled, [$payableModel]);
+			return call_user_func_array($this->enabled, [$payable]);
 		}
 		return $this->enabled;
 	}

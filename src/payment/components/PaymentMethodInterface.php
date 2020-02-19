@@ -8,4 +8,6 @@ interface PaymentMethodInterface
 	public function getPaymentRecordData();
 	
 	public function getPurchaseRequestAmountParamName();
+	
+	public function getPaymentDataForGateway($payable);
 }

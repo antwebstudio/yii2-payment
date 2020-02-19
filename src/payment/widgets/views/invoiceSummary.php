@@ -5,7 +5,7 @@ use ant\payment\widgets\InvoiceDetail;
 <div id="<?= $this->context->id ?>" class="invoice-summary" style="position: relative; ">
     <div class="card panel panel-default"> 
         <div class="ribbon-wrapper"><div class="ribbon <?= $model->isPaid ? 'green' : 'red' ?>"><?= $model->isPaid ? 'Paid' : 'Unpaid' ?></div></div>
-        <div class="card-heading panel-heading"><?= $this->context->renderHeader() ?></div>
+        <div class="card-header panel-heading"><?= $this->context->renderHeader() ?></div>
         <div class="card-body panel-body">
 		
 			<?= $this->context->renderDetail() ?>

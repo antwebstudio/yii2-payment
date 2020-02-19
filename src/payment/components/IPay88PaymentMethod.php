@@ -24,6 +24,42 @@ class IPay88PaymentMethod extends \ant\payment\components\PaymentMethod
 		];
 	}
 	
+	public function getPaymentDataForGateway($payable) {
+		$data = parent::getPaymentDataForGateway($payable);
+		if (isset($data)) return $data;
+		
+		$returnUrl = \Yii::$app->payment->getReturnUrl($this->name);
+		$cancelUrl = \Yii::$app->payment->getCancelUrl($this->name);
+		$referenceId = \Yii::$app->payment->getPaymentDescription($payable);
+		$paymentDescription = \Yii::$app->payment->getPaymentDescription($payable);
+		$paymentId = null;
+
+		$cancelUrlParams = $returnUrlParams = \Yii::$app->request->get();
+		array_unshift($returnUrlParams, $returnUrl);
+		array_unshift($cancelUrlParams, $cancelUrl);
+		$backendUrlParams = $returnUrlParams;
+		$backendUrlParams['backend']  = 1;
+		
+		return [
+			'amount' => $payable->getDueAmount(),
+			'currency' => $payable->getCurrency(),
+			'expires_in' =>  time() + 10,
+			'card' => [
+				'billingName' => $payable->billedTo->contactName,
+				'email' => $payable->billedTo->email,
+				'number' => $payable->billedTo->contact_number,
+			],
+			'paymentId' => $paymentId,
+			'description' => $paymentDescription,
+			'transactionId' => $referenceId,
+			// 'card' => $formData,
+
+			'returnUrl' => \yii\helpers\Url::to($returnUrlParams, true),
+			'cancelUrl' => \yii\helpers\Url::to($cancelUrlParams, true),
+			'backendUrl' => \yii\helpers\Url::to($backendUrlParams, true),
+		];
+	}
+	
 	public function getPaymentRecordData() {
 		$data = $this->_response->getData();
 		

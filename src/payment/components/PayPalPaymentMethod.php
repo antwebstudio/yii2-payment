@@ -16,6 +16,13 @@ class PayPalPaymentMethod extends PaymentMethod
 		return $this->_gateway->createCard($options);
 	}
 	
+	public function getPaymentDataForGateway($payable) {
+		$returnUrl = \Yii::$app->payment->getReturnUrl($this->name);
+		$cancelUrl = \Yii::$app->payment->getCancelUrl($this->name);
+		
+		return ['amount' => $payable->dueAmount, 'returnUrl' => $returnUrl, 'cancelUrl' => $cancelUrl];
+	}
+	
 	/*
 	Example：
 	
@@ -58,7 +65,7 @@ class PayPalPaymentMethod extends PaymentMethod
 		if (isset($data['L_ERRORCODE0']) && in_array($data['L_ERRORCODE0'], ['10002', '10406'])) {
 			// Invalid credential
 			throw new \Exception('('.$data['L_ERRORCODE0'].') '.$data['L_LONGMESSAGE0'].print_r($data,1));
-		} else {
+		} else if (isset($data['PAYMENTINFO_0_AMT'])) {
 			return [
 			//	'transaction_id' => 
 				'amount' => $data['PAYMENTINFO_0_AMT'],
@@ -71,6 +78,8 @@ class PayPalPaymentMethod extends PaymentMethod
 				'error' => isset($data['L_LONGMESSAGE0']) ? $data['L_LONGMESSAGE0'] : '',
 				'data' => is_array($data) ? json_encode($data) : $data,
 			];
+		} else {
+			throw new \Exception(print_r($data, 1));
 		}
 	}
 	

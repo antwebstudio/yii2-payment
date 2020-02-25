@@ -141,6 +141,11 @@ class Payment extends \yii\db\ActiveRecord
         $this->amount = str_replace([',', ' '], '', $this->amount);
         return parent::beforeValidate();
     }
+	
+	public function getPaymentMethod() {
+		$className = $this->payment_gateway;
+		return new $className;
+	}
 
     public function getIsManual() {
         // @TODO remove hard code

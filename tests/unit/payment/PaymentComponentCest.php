@@ -314,6 +314,10 @@ class TestPayable extends \yii\db\ActiveRecord implements Payable, Billable {
 		
 	}
 	
+	public function getPaidAmount() {
+		return 0;
+	}
+	
     public function getDueAmount() {
 		return 10;
 	}

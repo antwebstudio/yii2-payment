@@ -5,6 +5,7 @@ use Yii;
 use Omnipay\Omnipay;
 use yii\helpers\Url;
 use yii\base\Component;
+use ant\payment\models\Invoice;
 
 abstract class PaymentMethod extends Component implements PaymentMethodInterface {
 	const STATUS_SUCCESS = 0;
@@ -68,6 +69,18 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 		$this->_response = $this->_gateway->completePurchase($options)->send();
 		return $this->_response;
 	}
+	
+	public function pay($payable, $amount = null, $currency = null) {
+		$paymentRecord = $this->getPaymentRecord();
+		$paymentRecord->is_valid = 1;
+		
+		if ($payable instanceof Invoice) $paymentRecord->invoice_id = $payable->id;
+		if (isset($amount)) $paymentRecord->amount = $amount;
+		if (isset($currency)) $paymentRecord->currency = $currency;
+		
+		if (!$paymentRecord->save()) throw new \Exception(print_r($paymentRecord->errors, 1));
+		return $paymentRecord;
+	}
 
     /*public function isPaymentValid()
     {
@@ -81,6 +94,24 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 	}
 	
 	public function getPaymentRecord() {
+		if (isset($this->_response)) {
+			return $this->getPaymentRecordFromResponse();
+		} else {
+			$adapter = new PaymentRecordAdapter;
+			Yii::configure($adapter, $this->getPaymentRecordData());
+			
+			$adapter->payment_gateway = $this::className();
+			$adapter->data = $this->getRawData();
+			$adapter->status = $adapter->is_valid ? 0 : 1;
+		}
+		return $adapter->getPaymentRecord();
+	}
+	
+	protected function getRawData() {
+		return isset($this->_response) ? $this->_response->getData() : ['empty'];
+	}
+	
+	protected function getPaymentRecordFromResponse() {
 		$adapter = new PaymentRecordAdapter;
 		Yii::configure($adapter, $this->getPaymentRecordData());
 		

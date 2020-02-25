@@ -21,6 +21,8 @@ interface Billable
 
     //public function getIsPaid();
 	
+	public function getPaidAmount();
+	
     public function getDueAmount();
 
     //public function getCalculatedNetTotal();

@@ -185,33 +185,38 @@ class Invoice extends ActiveRecord implements Payable
 		return $this->getPrivateRoute($params);
 	}
 	
-	public function refund($amount) {
-		return $this->_pay( -$amount);
+	public function refund($amount, $currency = 'MYR') {
+		return $this->_pay( -$amount, $currency);
 	}
 	
-	public function refundManually($amount) {
-		return $this->_pay( -$amount, self::STATUS_PAID_MANUALLY);
+	public function refundManually($amount, $currency = 'MYR') {
+		$this->status = self::STATUS_PAID_MANUALLY;
+		return $this->_pay( -$amount, $currency);
 	}
 	
-	public function payManually($amount, $save = true) {
-		return $this->_pay($amount, self::STATUS_PAID_MANUALLY, $save);
+	public function payManually($amount, $currency = 'MYR', $save = true) {
+		if (YII_DEBUG && (is_int($currency) || $currency === true || $currency === false)) throw new \Exception('Currency value "'.$currency.'" is invalid. ');
+		
+		if ($this->dueAmount <= $amount) {
+			$this->status = self::STATUS_PAID_MANUALLY;
+		}
+		return $this->_pay($amount, $currency, $save);
 	}
 	
-	public function pay($amount, $status = Invoice::STATUS_PAID, $save = true) {
-		return $this->_pay($amount, $status, $save);
+	public function pay($amount, $currency = 'MYR', $save = true) {
+		if (YII_DEBUG && is_int($currency)) throw new \Exception('Currency value "'.$currency.'" is invalid. ');
+		
+		if ($this->dueAmount <= $amount) {
+			$this->status = self::STATUS_PAID;
+		}
+		return $this->_pay($amount, $currency, $save);
 	}
 
-	protected function _pay($amount, $status = null, $save = true)
+	protected function _pay($amount, $currency = null, $save = true)
 	{
 		//if ($this->dueAmount <= $amount)
 		//{
 			$this->paid_amount += $amount;
-
-			if (isset($status)) {
-				$this->status = $status;
-			} else if ($this->dueAmount > 0) {
-				$this->status = self::STATUS_UNPAID;
-			}
 
 			$this->_calculatedPaidAmount = null;
 

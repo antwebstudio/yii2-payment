@@ -47,7 +47,7 @@ class CreditPaymentMethod extends PaymentMethod
 	}*/
 	
 	public function getPaymentRecordData() {
-        $data = $this->_response->getData();
+        $data = isset($this->_response) ? $this->_response->getData() : [];
         
         $data['data'] = $data;
 		
@@ -95,4 +95,3 @@ class CreditPaymentMethodResponse  {
         return $this->reference.'-'.time();
     }
 }
-?>

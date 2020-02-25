@@ -418,6 +418,16 @@ class InvoiceCest
 		$I->assertSame('125.40', $invoice->getPaidAmount()); // Use assertSame and string for expected result for currency
 		$I->assertTrue($invoice->isPaid);
 	}
+	
+	public function testPay(UnitTester $I) {
+		$user = $I->grabFixture('user')->getModel(0);
+		$invoice = $this->createInvoice();
+		
+		$invoice->pay(10);
+		$invoice->refresh();
+		
+		$I->assertEquals(10, $invoice->paid_amount);
+	}
 
 	public function testPayManually(UnitTester $I) {
 		$amount = 125.40;
@@ -613,7 +623,7 @@ class InvoiceCestTestModel2 extends InvoiceCestTestModel {
 }
 
 class InvoiceCestTestModelPayableItem extends \yii\base\Model implements BillableItem {
-	use \ant\payment\traits\BillableTrait;
+	use \ant\payment\traits\BillableItemTrait;
 	//public $discount;
 	
 	public function getDiscount() {

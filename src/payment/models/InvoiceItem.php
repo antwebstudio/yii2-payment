@@ -25,7 +25,7 @@ use ant\payment\models\PayableItem;
  */
 class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 {
-	use \ant\payment\traits\BillableTrait;
+	use \ant\payment\traits\BillableItemTrait;
 	
     /**
      * @inheritdoc

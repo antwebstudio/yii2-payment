@@ -120,7 +120,11 @@ class PaymentComponent extends \yii\base\Component {
 		$name = strlen($name) ? $name : 'ipay88';
 		
 		if (!isset($this->_paymentMethod[$name])) {
-			$config = $this->paymentMethodConfigs[$name];
+			if (isset($this->paymentMethodConfigs[$name])) {
+				$config = $this->paymentMethodConfigs[$name];
+			} else {
+				throw new \Exception('Payment method type "'.$name.'" is not exist. ');
+			}
 			$config['name'] = $name;
 			
 			$this->_paymentMethod[$name] = Yii::createObject($config);

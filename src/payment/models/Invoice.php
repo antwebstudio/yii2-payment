@@ -177,6 +177,10 @@ class Invoice extends ActiveRecord implements Payable
         ];
     }
 	
+	public function getAttributeLabel($attribute) {
+		return Yii::t('payment', parent::getAttributeLabel($attribute));
+	}
+	
 	public function getAdminPanelRoute($params = []) {
 		return ['/payment/backend/invoice/view', 'id' => $this->id];
 	}

@@ -62,7 +62,7 @@ class InvoiceSummary extends Widget{
 			$column = $attribute;
 			
 			if (isset($column['label'])) {
-				return $column['label'];
+				return \Yii::t('payment', $column['label']);
 			} else if (isset($column['attribute'])) {
 				return $model->getAttributeLabel($column['attribute']);
 			}
@@ -103,7 +103,7 @@ class InvoiceSummary extends Widget{
 	
 	public function renderHeader() {
 		return strtr($this->header, [
-			'{title}' => $this->title,
+			'{title}' => \Yii::t('payment', $this->title),
 		]);
 	}
 	

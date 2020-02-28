@@ -77,7 +77,7 @@ class InvoiceDetail extends \yii\base\Widget {
 			$column = $attribute;
 			
 			if (isset($column['label'])) {
-				return $column['label'];
+				return \Yii::t('payment', $column['label']);
 			} else if (isset($column['attribute'])) {
 				return $model->getAttributeLabel($column['attribute']);
 			}

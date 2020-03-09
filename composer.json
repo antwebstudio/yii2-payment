@@ -19,6 +19,7 @@
 		"antweb/yii2-user" : "*"
 	},
     "require-dev": {
+		"antweb/yii2-cart" : "*",
         "yiisoft/yii2-codeception": "~2.0.0",
         "yiisoft/yii2-gii": "~2.0.0",
         "yiisoft/yii2-faker": "~2.0.0",

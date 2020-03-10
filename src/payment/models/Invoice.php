@@ -198,6 +198,10 @@ class Invoice extends ActiveRecord implements Payable
 		return $this->_pay( -$amount, $currency);
 	}
 	
+	public function markAsPaid() {
+		return $this->payManually($this->dueAmount);
+	}
+	
 	public function payManually($amount, $currency = 'MYR', $save = true) {
 		if (YII_DEBUG && (is_int($currency) || $currency === true || $currency === false)) throw new \Exception('Currency value "'.$currency.'" is invalid. ');
 		

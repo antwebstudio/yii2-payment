@@ -108,21 +108,37 @@ class InvoiceSummary extends Widget{
 	}
 	
 	public function renderColumnHeader($model, $column) {
-		$options = isset($column['headerOptions']) ? $column['headerOptions'] : [];
-		return Html::tag('th', $this->getSummaryCellLabel($model, $column), $options);
+		$column = $this->normalizeColumn($column);
+		if ($column['visible']) {
+			$options = isset($column['headerOptions']) ? $column['headerOptions'] : [];
+			return Html::tag('th', $this->getSummaryCellLabel($model, $column), $options);
+		}
 	}
 	
 	public function renderRow($model) {
 		$html = Html::beginTag('tr');
 		
 		foreach ($this->columns as $column) {
-			$options = isset($column['options']) ? $column['options'] : ['class' => 'text-right'];
-			$html .= Html::tag('td', $this->renderRowValueCellContent($model, $column), $options);
+			$column = $this->normalizeColumn($column);
+			
+			if ($column['visible']) {
+				$options = isset($column['options']) ? $column['options'] : ['class' => 'text-right'];
+				$html .= Html::tag('td', $this->renderRowValueCellContent($model, $column), $options);
+			}
 		}
 		
 		$html .= Html::endTag('tr');
 		
 		return $html;
+	}
+	
+	protected function normalizeColumn($column) {
+		foreach (['visible'] as $name) {
+			if (!isset($column[$name])) {
+				$column[$name] = true;
+			}
+		}
+		return $column;
 	}
 	
 	protected function renderRowValueCellContent($model, $column) {
@@ -134,8 +150,20 @@ class InvoiceSummary extends Widget{
 		return $model->{$column};
 	}
 	
+	protected function calculateColumn() {
+		$count = 0;
+		foreach ($this->columns as $column) {
+			$column = $this->normalizeColumn($column);
+			
+			if ($column['visible']) {
+				$count++;
+			}
+		}
+		return $count;
+	}
+	
 	public function renderSummaryRow($model, $attribute) {
-		$labelOptions = isset($attribute['labelOptions']) ? $attribute['labelOptions'] : ['colspan' => 3, 'class' => 'text-right'];
+		$labelOptions = isset($attribute['labelOptions']) ? $attribute['labelOptions'] : ['colspan' => $this->calculateColumn() - 1, 'class' => 'text-right'];
 		$options = isset($attribute['options']) ? $attribute['options'] : ['class' => 'text-right'];
 		
 		$html = Html::beginTag('tr');

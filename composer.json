@@ -16,7 +16,8 @@
         "omnipay/paypal": "~2.0",
         "inspirenmy/omnipay-ipay88": "*",
 		"antweb/yii2-core" : "*",
-		"antweb/yii2-user" : "*"
+		"antweb/yii2-user" : "*",
+        "antweb/yii2-discount": "@dev"
 	},
     "require-dev": {
 		"antweb/yii2-cart" : "*",

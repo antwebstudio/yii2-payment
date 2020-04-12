@@ -380,6 +380,15 @@ class Invoice extends ActiveRecord implements Payable
 	public function getInvoiceItems() {
 		return $this->hasMany(InvoiceItem::className(), ['invoice_id' => 'id']);
 	}
+	
+	public function getBillable() {
+		$query = $this->owner->hasOne(\ant\models\ModelClass::getClassName($this->billable_class_id, ['id' => 'billable_id'])
+			->andWhere([
+					'{{%tenant_map}}.model_class_id' => \ant\models\ModelClass::getClassId(get_class($this->owner)),
+			]);
+	
+		return $query;
+	}
 
     /**
      * @return \yii\db\ActiveQuery
@@ -485,8 +494,8 @@ class Invoice extends ActiveRecord implements Payable
 		if (isset($userId)) {
 			$invoice->issue_to = $userId;
 		} else if(!Yii::$app->user->isGuest) {
-			if (YII_DEBUG) throw new \Exception('DEPRECATED');
-			$invoice->issue_to = Yii::$app->user->identity->id;
+			//if (YII_DEBUG) throw new \Exception('DEPRECATED');
+			//$invoice->issue_to = Yii::$app->user->identity->id;
 		} else {
 			//if (YII_DEBUG) throw new \Exception('DEPRECATED');
 			//$invoice->issue_to = 0;
@@ -525,6 +534,25 @@ class Invoice extends ActiveRecord implements Payable
 				return false;
 			}
 		}
+		
+		/*if (isset($payable->cart)) {
+			foreach ($payable->cart->getCharges() as $name => $charge) {
+				$charge = $payable->cart->getCharge($name);
+				
+				$invoiceItem = new InvoiceItem();
+				$invoiceItem->title = $charge->label;
+				$invoiceItem->unit_price = $charge->price;
+				$invoiceItem->included_in_subtotal = 0;
+				$invoiceItem->invoice_id = $invoice->id;
+
+				if(!$invoiceItem->save())
+				{
+					$transaction->rollBack();
+					throw new \Exception(Html::errorSummary($invoiceItem));
+					return false;
+				}
+			}
+		}*/
 		
 		// Validate invoice
 		if ($invoice->getCalculatedTotalAmount() != $invoice->total_amount) {

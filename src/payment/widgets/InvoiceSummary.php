@@ -8,7 +8,8 @@ use yii\helpers\ArrayHelper;
 use ant\payment\models\Payment;
 use yii\data\ActiveDataProvider;
 
-class InvoiceSummary extends Widget{
+class InvoiceSummary extends Widget {
+	public $viewFile = 'invoice';
 	public $model;
 	public $header = '{title}';
 	public $title = 'Details';
@@ -53,7 +54,7 @@ class InvoiceSummary extends Widget{
 
 	public function run(){	
 
-        return $this->render('invoiceSummary', ['model' => $this->model]);
+        return $this->render($this->viewFile, ['model' => $this->model]);
             
 	}
 

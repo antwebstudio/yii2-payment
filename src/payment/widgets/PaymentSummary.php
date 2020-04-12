@@ -8,6 +8,7 @@ use ant\payment\models\Payment;
 use yii\data\ActiveDataProvider;
 class PaymentSummary extends Widget{
 	public $model;
+    public $invoiceId;
     public $invoice_id;
 	
 	public function init()
@@ -16,8 +17,11 @@ class PaymentSummary extends Widget{
 	}
 
 	public function run(){	
-
-        $model = Payment::find()->andWhere(['invoice_id' => $this->invoice_id]);
+		if (!isset($this->invoiceId) && isset($this->invoice_id)) {
+			$this->invoiceId = $this->invoice_id;
+			if (YII_DEBUG) throw new \Exception('Please use invoiceId instead of invoice_id. '); // 2020-04-12
+		}
+        $model = Payment::find()->andWhere(['invoice_id' => $this->invoiceId]);
         // echo "<pre>";
         // print_r($model);
         // echo "</pre>";

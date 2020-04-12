@@ -26,6 +26,7 @@ class M181022094024_permissions extends Migration
 				'index' => ['View my invoices', [Role::ROLE_USER]],
 				'view-by-link' => ['View invoice by private link', [Role::ROLE_GUEST]],
 			],
+			// Backend
 			\ant\payment\backend\controllers\DefaultController::className() => [
 				'index' => ['View all invoices', [Role::ROLE_ADMIN]],
 				'view' => ['View invoice detail', [Role::ROLE_ADMIN]],
@@ -40,6 +41,10 @@ class M181022094024_permissions extends Migration
 			\ant\payment\backend\controllers\PaymentController::class => [
 				'approve' => ['Approve a payment', [Role::ROLE_ADMIN]],
 				'unapprove' => ['Unapprove a payment', [Role::ROLE_ADMIN]],
+			],
+			// Models
+			\ant\payment\models\Invoice::class => [
+				'view-payment-record' => ['View invoice payment records', [Role::ROLE_ADMIN]],
 			],
 		];
 		

@@ -57,8 +57,20 @@ class PaymentComponent extends \yii\base\Component {
 		return $response;
 	}
 	
-	public function getPaymentMethods($payable, $includedDisabled = false) {
-		return $this->getAllPaymentMethodFor($payable);
+	public function getPaymentMethods($payable = null, $includedDisabled = false) {
+		if (isset($payable)) {
+			if (YII_DEBUG) throw new \Exception('DEPRECATED, please use getAllPaymentMethodFor directly. '); // 2020-04-15
+			return $this->getAllPaymentMethodFor($payable);
+		} else {
+			$enabledPaymentMethods = [];
+			foreach ($this->paymentMethodConfigs as $name => $config) {
+				if ($includedDisabled || !isset($config['enabled']) || $config['enabled']) {
+					$paymentMethod = $this->getPaymentMethod($name);
+					$enabledPaymentMethods[$name] = $paymentMethod;
+				}
+			}
+			return $enabledPaymentMethods;
+		}
 	}
 	
 	public function getAllPaymentMethodFor($payable, $includedDisabled = false) {

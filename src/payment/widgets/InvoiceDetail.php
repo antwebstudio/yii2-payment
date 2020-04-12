@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 
 class InvoiceDetail extends \yii\base\Widget {
+	public $viewFile = 'invoice-detail';
 	public $model;
 	
 	public $labelOptions = ['class' => 'col-md-3 order-detail-label'];
@@ -56,20 +57,22 @@ class InvoiceDetail extends \yii\base\Widget {
 	];
 
 	public function run(){
-        return $this->render('invoice-detail', ['model' => $this->model]);
+        return $this->render($this->viewFile, ['model' => $this->model]);
 	}
 
 	public function renderDetailRow($model, $column) {
-		$html = Html::beginTag('tr', $this->rowOptions);
-		
-		$labelOptions = isset($column['labelOptions']) ? $column['labelOptions'] : $this->labelOptions;
-		$options = isset($column['options']) ? $column['options'] : $this->cellOptions;
-		$html .= Html::tag('td', $this->getDataCellLabel($model, $column), $labelOptions);
-		$html .= Html::tag('td', $this->getDataCellValue($model, $column), $options);
-		
-		$html .= Html::endTag('tr');
-		
-		return $html;
+		if (!isset($column['visible']) || $column['visible']) {
+			$html = Html::beginTag('tr', $this->rowOptions);
+			
+			$labelOptions = isset($column['labelOptions']) ? $column['labelOptions'] : $this->labelOptions;
+			$options = isset($column['options']) ? $column['options'] : $this->cellOptions;
+			$html .= Html::tag('td', $this->getDataCellLabel($model, $column), $labelOptions);
+			$html .= Html::tag('td', $this->getDataCellValue($model, $column), $options);
+			
+			$html .= Html::endTag('tr');
+			
+			return $html;
+		}
 	}
 
 	protected function getDataCellLabel($model, $attribute) {

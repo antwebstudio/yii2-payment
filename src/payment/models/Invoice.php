@@ -269,7 +269,7 @@ class Invoice extends ActiveRecord implements Payable
 		} else if (isset($this->id)) {
 			$this->formatted_id = $this->generateFormattedId();
 			if ($this->formatted_id != $this->id) {
-				$this->save();
+				$this->save(true, ['formatted_id']);
 			}
 			return $this->formatted_id;
 		}
@@ -382,12 +382,7 @@ class Invoice extends ActiveRecord implements Payable
 	}
 	
 	public function getBillable() {
-		$query = $this->owner->hasOne(\ant\models\ModelClass::getClassName($this->billable_class_id, ['id' => 'billable_id'])
-			->andWhere([
-					'{{%tenant_map}}.model_class_id' => \ant\models\ModelClass::getClassId(get_class($this->owner)),
-			]);
-	
-		return $query;
+		return $this->owner->hasOne(\ant\models\ModelClass::getClassName($this->billable_class_id), ['id' => 'billable_id']);
 	}
 
     /**
@@ -490,6 +485,11 @@ class Invoice extends ActiveRecord implements Payable
 			'status' => Invoice::STATUS_ACTIVE,
 			'billed_to' => $contactId,
 		]);
+		
+		if (isset($invoice->id)) {
+			$invoice->billable_id = $payable->id;
+			$invoice->billable_class_id = \ant\models\ModelClass::getClassId($payable);
+		}
 
 		if (isset($userId)) {
 			$invoice->issue_to = $userId;
@@ -535,7 +535,7 @@ class Invoice extends ActiveRecord implements Payable
 			}
 		}
 		
-		/*if (isset($payable->cart)) {
+		if (isset($payable->cart)) {
 			foreach ($payable->cart->getCharges() as $name => $charge) {
 				$charge = $payable->cart->getCharge($name);
 				
@@ -552,7 +552,7 @@ class Invoice extends ActiveRecord implements Payable
 					return false;
 				}
 			}
-		}*/
+		}
 		
 		// Validate invoice
 		if ($invoice->getCalculatedTotalAmount() != $invoice->total_amount) {

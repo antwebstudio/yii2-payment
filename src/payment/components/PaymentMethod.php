@@ -138,6 +138,8 @@ abstract class PaymentMethod extends Component implements PaymentMethodInterface
 	public function getPayUrl($payable) {
 		if (get_class($payable) == 'ant\order\models\Order') {
 			$type = 'order';
+		} else if (get_class($payable) == 'ant\payment\models\Invoice') {
+			$type = 'invoice';
 		}
 		return Url::to(['/payment/default/pay', 
 			'payId' => $payable->id, 

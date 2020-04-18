@@ -25,12 +25,22 @@ class PaymentController extends \yii\web\Controller {
         $model = Payment::findOne($id);
         
         if ($model->status != Payment::STATUS_SUCCESS) {
-            if ($model->approve()->save()) {
-                $model->invoice->pay($model->amount);
-                Yii::$app->session->setFlash('success', 'Payment succesfully approved. ');
-            } else {
-                Yii::$app->session->setFlash('error', 'Payment failed to be approved. ');
-            }
+			$transaction = Yii::$app->db->beginTransaction();
+			
+			try {
+				if ($model->approve()->save()) {
+					$model->invoice->pay($model->amount)->save();
+					Yii::$app->session->setFlash('success', 'Payment succesfully approved. ');
+				} else {
+					throw new \Exception(print_r($model->errors, 1));
+				}
+				$transaction->commit();
+			} catch (\Exception $ex) {
+				$transaction->rollback();
+				if (YII_DEBUG) throw $ex;
+				
+				Yii::$app->session->setFlash('error', 'Payment failed to be approved. ');
+			}
         }
         return $this->redirect(Yii::$app->request->referrer);
     }
@@ -39,12 +49,22 @@ class PaymentController extends \yii\web\Controller {
         $model = Payment::findOne($id);
         
         if ($model->status == Payment::STATUS_SUCCESS) {
-            if ($model->unapprove()->save()) {
-                $model->invoice->pay(0 - $model->amount);
-                Yii::$app->session->setFlash('success', 'Payment succesfully unapproved. ');
-            } else {
-                Yii::$app->session->setFlash('error', 'Payment failed to be unapproved. ');
-            }
+			$transaction = Yii::$app->db->beginTransaction();
+			
+			try {
+				if ($model->unapprove()->save()) {
+					$model->invoice->pay(0 - $model->amount)->save();
+					Yii::$app->session->setFlash('success', 'Payment succesfully unapproved. ');
+				} else {
+					throw new \Exception(print_r($model->errors, 1));
+				}
+				$transaction->commit();
+			} catch (\Exception $ex) {
+				$transaction->rollback();
+				if (YII_DEBUG) throw $ex;
+				
+				Yii::$app->session->setFlash('error', 'Payment failed to be unapproved. ');
+			}
         }
         return $this->redirect(Yii::$app->request->referrer);
     }

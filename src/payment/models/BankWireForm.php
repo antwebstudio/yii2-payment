@@ -18,6 +18,7 @@ class BankWireForm extends \ant\base\FormModel {
     public $time;
     public $reference;
     public $attachment;
+	public $sendNotificationEmailToAdmin = true;
 
     public $currency = 'MYR';
 
@@ -54,7 +55,7 @@ class BankWireForm extends \ant\base\FormModel {
                 throw new \Exception(print_r($this->_payment->errors, 1));
             }
         }
-        $this->sendNotificationEmailToAdmin();
+        if ($this->sendNotificationEmailToAdmin) $this->sendNotificationEmailToAdmin();
         return true;
     }
 

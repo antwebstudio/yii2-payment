@@ -10,6 +10,8 @@ $url = Yii::$app->frontendUrlManager->createAbsoluteUrl($model->privateRoute);
 $whatsAppText = 'Thank you for purchase with us. '."\n\n".'Please check your invoice at: '.$url;
 $whatsAppText = Yii::t('payment', $whatsAppText);
 ?>
+<?= \ant\widgets\Alert::widget() ?>
+
 <?php if (Permission::can('pay', \ant\payment\backend\controllers\InvoiceController::class)): ?>
 	<?php $form = \yii\widgets\ActiveForm::begin(['action' => ['/payment/backend/invoice/pay', 'id' => $model->id]]) ?>
 		<div class="form-group">
@@ -27,6 +29,7 @@ $whatsAppText = Yii::t('payment', $whatsAppText);
 			<div class="card-body text-center">
 				<a class="btn btn-dark" href="<?= Url::to(['/order/backend', 'view' => 'simplecommerce']) ?>"><?= Yii::t('order', 'Back') ?></a>
 				<a class="btn btn-secondary" target="_blank" href="<?= WhatsApp::apiUrl(WhatsApp::addCountryPrefix($model->billedTo->contact_number), $whatsAppText) ?>">WhatsApp</a>
+				<a class="btn btn-primary" target="_blank" href="<?= Yii::$app->frontendUrlManager->createUrl($model->privateRoute) ?>">Preview</a>
 			</div>
 		</div>
 	</div>
@@ -46,7 +49,7 @@ $whatsAppText = Yii::t('payment', $whatsAppText);
 	<div class="col-md-12">
 		<div class='table-responsive'>
 		<?= \ant\payment\widgets\PaymentSummary::widget([
-				'invoice_id' => $model->id
+				'invoiceId' => $model->id
 			]) 
 		?>
 		</div>

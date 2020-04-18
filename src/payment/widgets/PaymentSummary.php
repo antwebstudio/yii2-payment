@@ -10,6 +10,7 @@ class PaymentSummary extends Widget{
 	public $model;
     public $invoiceId;
     public $invoice_id;
+	public $viewFile = 'payment-summary';
 	
 	public function init()
 	{
@@ -32,7 +33,7 @@ class PaymentSummary extends Widget{
             'pageSize' => 10,
         ],
         ]);
-        return $this->render('paymentSummary', ['dataProvider' => $dataProvider]);
+        return $this->render($this->viewFile, ['dataProvider' => $dataProvider]);
     }
 }
 

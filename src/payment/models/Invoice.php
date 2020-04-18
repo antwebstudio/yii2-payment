@@ -214,10 +214,19 @@ class Invoice extends ActiveRecord implements Payable
 	public function pay($amount, $currency = 'MYR', $save = true) {
 		if (YII_DEBUG && is_int($currency)) throw new \Exception('Currency value "'.$currency.'" is invalid. ');
 		
+		$this->paid_amount += $amount;
+
+		$this->_calculatedPaidAmount = null;
+
+		if ($this->paid_amount == $this->total_amount) {
+			$this->trigger(self::EVENT_PAID);
+		}
+		
 		if ($this->dueAmount <= $amount) {
 			$this->status = self::STATUS_PAID;
 		}
-		return $this->_pay($amount, $currency, $save);
+		if (!$this->save()) throw new \Exception(print_r($this->errors,1));
+		return $this;
 	}
 
 	protected function _pay($amount, $currency = null, $save = true)
@@ -486,7 +495,7 @@ class Invoice extends ActiveRecord implements Payable
 			'billed_to' => $contactId,
 		]);
 		
-		if (isset($invoice->id)) {
+		if (isset($payable->id)) {
 			$invoice->billable_id = $payable->id;
 			$invoice->billable_class_id = \ant\models\ModelClass::getClassId($payable);
 		}

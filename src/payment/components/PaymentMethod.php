@@ -6,11 +6,12 @@ use Omnipay\Omnipay;
 use yii\helpers\Url;
 use yii\base\Component;
 use ant\payment\models\Invoice;
+use ant\payment\models\Payment;
 
 abstract class PaymentMethod extends Component implements PaymentMethodInterface {
-	const STATUS_SUCCESS = 0;
+	const STATUS_SUCCESS = Payment::STATUS_SUCCESS;
 	const STATUS_ERROR = 1;
-	const STATUS_PENDING = 2;
+	const STATUS_PENDING = Payment::STATUS_PENDING;
 	
 	public $name;
 	public $enabled = true;

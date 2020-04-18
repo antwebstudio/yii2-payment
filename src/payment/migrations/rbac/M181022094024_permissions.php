@@ -39,6 +39,7 @@ class M181022094024_permissions extends Migration
 				'cancel-pay' => ['Cancel payment for invoice', [Role::ROLE_ADMIN]],
 			],
 			\ant\payment\backend\controllers\PaymentController::class => [
+				'index' => ['View a payment', [Role::ROLE_ADMIN]],
 				'approve' => ['Approve a payment', [Role::ROLE_ADMIN]],
 				'unapprove' => ['Unapprove a payment', [Role::ROLE_ADMIN]],
 			],

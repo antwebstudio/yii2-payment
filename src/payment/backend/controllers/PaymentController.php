@@ -4,6 +4,7 @@ namespace ant\payment\backend\controllers;
 
 use Yii;
 use ant\payment\models\Payment;
+use yii\data\ActiveDataProvider;
 
 /**
  * Default controller for the `event` module
@@ -19,6 +20,15 @@ class PaymentController extends \yii\web\Controller {
                 ],
             ]
         ];
+    }
+    public function actionIndex() {
+        $dataProvider = new ActiveDataProvider([
+            'query' => Payment::find(),
+        ]);
+
+        return $this->render($this->action->id, [
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     public function actionApprove($id) {
@@ -53,7 +63,7 @@ class PaymentController extends \yii\web\Controller {
 			
 			try {
 				if ($model->unapprove()->save()) {
-					$model->invoice->pay(0 - $model->amount)->save();
+					$model->invoice->cancelPayment($model);
 					Yii::$app->session->setFlash('success', 'Payment succesfully unapproved. ');
 				} else {
 					throw new \Exception(print_r($model->errors, 1));

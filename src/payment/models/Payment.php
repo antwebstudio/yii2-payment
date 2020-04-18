@@ -124,6 +124,14 @@ class Payment extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+	
+	public function getAttributeLabel($attribute) {
+		return Yii::t('payment', parent::getAttributeLabel($attribute));
+	}
+	
+	public static function find() {
+		return new \ant\payment\models\query\PaymentQuery(get_called_class());
+	}
 
     public function approve() {
         $this->status = self::STATUS_SUCCESS;

@@ -41,6 +41,7 @@ class Invoice extends ActiveRecord implements Payable
 	const STATUS_TEXT_DEFAULT = 'Unknown';
 
 	const EVENT_PAID = 'paid';
+	const EVENT_PAYMENT_CANCELED = 'payment_canceled';
 
 	protected $_calculatedTotalAmount;
 	protected $_calculatedPaidAmount;
@@ -201,6 +202,17 @@ class Invoice extends ActiveRecord implements Payable
 	public function markAsPaid() {
 		return $this->payManually($this->dueAmount);
 	}
+	
+	public function cancelPayment($payment) {
+		$payment = is_object($payment) ? $payment : Payment::findOne($payment);
+		if (!isset($payment)) throw new \Exception('Payment not exist. ');
+		
+		$this->pay(0 - $payment->amount);
+		
+		$this->trigger(self::EVENT_PAYMENT_CANCELED);
+			
+		return $this;
+	} 
 	
 	public function payManually($amount, $currency = 'MYR', $save = true) {
 		if (YII_DEBUG && (is_int($currency) || $currency === true || $currency === false)) throw new \Exception('Currency value "'.$currency.'" is invalid. ');
@@ -391,7 +403,7 @@ class Invoice extends ActiveRecord implements Payable
 	}
 	
 	public function getBillable() {
-		return $this->owner->hasOne(\ant\models\ModelClass::getClassName($this->billable_class_id), ['id' => 'billable_id']);
+		return $this->hasOne(\ant\models\ModelClass::getClassName($this->billable_class_id), ['id' => 'billable_id']);
 	}
 
     /**

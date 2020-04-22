@@ -2,12 +2,19 @@
 namespace ant\payment\models\query;
 
 class InvoiceQuery extends \yii\db\ActiveQuery {
+	public static $morphingClass;
+	
 	public function behaviors() {
 		return [
 			[
 				'class' => 'ant\behaviors\DateTimeAttributeQueryBehavior',
 			],
 		];
+	}
+	
+	public function joinWithMorph($with, $morphClass, $eagerLoading = true, $joinType = 'LEFT JOIN') {
+		self::$morphingClass = $morphClass;
+		return $this->joinWith($with, $eagerLoading, $joinType);
 	}
 	
 	public function issueToUser($user) {

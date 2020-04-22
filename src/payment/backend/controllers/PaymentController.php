@@ -23,7 +23,9 @@ class PaymentController extends \yii\web\Controller {
     }
     public function actionIndex() {
         $dataProvider = new ActiveDataProvider([
-            'query' => Payment::find(),
+            'query' => Payment::find()->joinWith(['invoice invoice' => function($query) {
+				$query->joinWithMorph('billable billable', \ant\order\models\Order::class);
+			}])->andWhere('billable.id IS NOT NULL'),
         ]);
 
         return $this->render($this->action->id, [

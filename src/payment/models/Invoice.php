@@ -403,7 +403,14 @@ class Invoice extends ActiveRecord implements Payable
 	}
 	
 	public function getBillable() {
-		return $this->hasOne(\ant\models\ModelClass::getClassName($this->billable_class_id), ['id' => 'billable_id']);
+		if (isset($this->billable_class_id)) {
+			$classNAme = \ant\models\ModelClass::getClassName($this->billable_class_id);
+		} else {
+			$queryInstance = self::find();
+			$className = $queryInstance::$morphingClass;
+			$queryInstance::$morphingClass = null; // Reset after get the value
+		}
+		return $this->hasOne(\ant\order\models\Order::class, ['id' => 'billable_id']);
 	}
 
     /**

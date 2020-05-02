@@ -134,7 +134,7 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 	
 	public function getDiscountAmount() {
 		$value = $this->discount_value ? $this->discount_value : 0;
-		$discount = new Discount($value, $this->discount_type);
+		$discount = new Discount($value + $this->additional_discount, $this->discount_type);
 		return $discount->of($this->unitPrice);
 	}
 	

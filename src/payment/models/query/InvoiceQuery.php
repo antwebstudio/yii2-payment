@@ -6,6 +6,7 @@ class InvoiceQuery extends \yii\db\ActiveQuery {
 	
 	public function behaviors() {
 		return [
+			\ant\behaviors\AttachBehaviorBehavior::class,
 			[
 				'class' => 'ant\behaviors\DateTimeAttributeQueryBehavior',
 			],

@@ -66,7 +66,7 @@ class InvoiceController extends Controller
 	}
 
     public function actionView($id) {
-		$model = Invoice::find()->andWhere(['id' => $id])->one();
+		$model = Invoice::findOne($id);
         
     	return $this->render('view', ['model' => $model]);
     }

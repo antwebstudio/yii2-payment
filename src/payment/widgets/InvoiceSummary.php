@@ -84,7 +84,11 @@ class InvoiceSummary extends Widget {
 		
         if ($value !== null) {
             if (is_string($value)) {
-                return ArrayHelper::getValue($model, $value);
+				if ($model->hasAttribute($value)) {
+					return ArrayHelper::getValue($model, $value);
+				} else {
+					return $value;
+				}
             } else {
                 return call_user_func($value, $model, $attribute, $index, $this);
             }
@@ -164,15 +168,20 @@ class InvoiceSummary extends Widget {
 	}
 	
 	public function renderSummaryRow($model, $attribute) {
+		$visible = isset($attribute['visible']) ? $attribute['visible'] : true;
+		if (is_callable($visible)) $visible = call_user_func_array($visible, [$model]);
+		
 		$labelOptions = isset($attribute['labelOptions']) ? $attribute['labelOptions'] : ['colspan' => $this->calculateColumn() - 1, 'class' => 'text-right'];
 		$options = isset($attribute['options']) ? $attribute['options'] : ['class' => 'text-right'];
 		
-		$html = Html::beginTag('tr');
-		
-		$html .= Html::tag('td', $this->renderSummaryLabelCellContent($model, $attribute), $labelOptions);
-		$html .= Html::tag('td', $this->renderSummaryValueCellContent($model, $attribute), $options);
-		$html .= Html::endTag('tr');
-		
+		$html = '';
+		if ($visible) {
+			$html = Html::beginTag('tr');
+			
+			$html .= Html::tag('td', $this->renderSummaryLabelCellContent($model, $attribute), $labelOptions);
+			$html .= Html::tag('td', $this->renderSummaryValueCellContent($model, $attribute), $options);
+			$html .= Html::endTag('tr');
+		}
 		return $html;
 	}
 	

@@ -404,13 +404,18 @@ class Invoice extends ActiveRecord implements Payable
 	
 	public function getBillable() {
 		if (isset($this->billable_class_id)) {
-			$classNAme = \ant\models\ModelClass::getClassName($this->billable_class_id);
+			$className = \ant\models\ModelClass::getClassName($this->billable_class_id);
 		} else {
 			$queryInstance = self::find();
 			$className = $queryInstance::$morphingClass;
 			$queryInstance::$morphingClass = null; // Reset after get the value
 		}
-		return $this->hasOne(\ant\order\models\Order::class, ['id' => 'billable_id']);
+		$className = \ant\order\models\Order::class;
+		if (method_exists($className, 'hasGlobalScope')) $className::detachGlobalScope('notDeleted');
+		$query = $this->hasOne(\ant\order\models\Order::class, ['id' => 'billable_id']);
+		if (method_exists($className, 'hasGlobalScope')) $className::attachGlobalScope('notDeleted');
+		
+		return $query;
 	}
 
     /**

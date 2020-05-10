@@ -557,6 +557,7 @@ class Invoice extends ActiveRecord implements Payable
 			$invoiceItem->description = $item->getDescription();
 			$invoiceItem->included_in_subtotal = $item->getIncludedInSubtotal() ? 1 : 0;
 			$invoiceItem->setDiscount($item->getDiscount());
+			$invoiceItem->setDiscountAmount($item->getDiscountAmount());
 			
 			$invoiceItem->invoice_id = $invoice->id;
 

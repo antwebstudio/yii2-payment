@@ -1,6 +1,7 @@
 <?php
 namespace ant\payment\widgets;
 
+use Yii;
 use yii\base\Widget;
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
@@ -9,12 +10,17 @@ use ant\payment\models\Payment;
 use yii\data\ActiveDataProvider;
 
 class InvoiceSummary extends Widget {
+	public $isPaid;
 	public $viewFile = 'invoice';
 	public $model;
-	public $header = '{title}';
+	public $header = '<div class="card-header panel-heading">{title}</div>';
+	public $template = '<div class="card panel panel-default">{ribbon}{header}<div class="card-body panel-body">{detail}{items}</div></div>';
+	public $ribbonTemplate = '<div class="ribbon-wrapper"><div class="ribbon {color}">{status}</div></div>';
 	public $title = 'Details';
 	public $showSubtotal = true;
 	public $itemsRelation = 'billItems';
+	public $options = [];
+	public $tableOptions = ['class' => 'table'];
 	public $detail = [];
 	public $columns = [
 		[
@@ -38,24 +44,37 @@ class InvoiceSummary extends Widget {
 		],
 	];
 	public $summary = [
-		'subtotal', 'discountAmount', 'serviceCharges', /*'tax_amount', */
-		[
-			'attribute' => 'netTotal',
-			'label' => 'Total',
-			'format' => 'html',
-		],
-		'paidAmount', 'dueAmount',
+		'attributes' => [
+			'subtotal', 'discountAmount', 'serviceCharges', /*'tax_amount', */
+			[
+				'attribute' => 'netTotal',
+				'label' => 'Total',
+				'format' => 'html',
+			],
+			'paidAmount', 'dueAmount',
+		]
 	];
 	
 	public function init()
 	{
+		if (YII_DEBUG) throw new \Exception('DEPRECATED'); // 2020-05-10
+		
         parent::init();
 	}
 
 	public function run(){	
-
-        return $this->render($this->viewFile, ['model' => $this->model]);
-            
+		if (is_callable($this->columns)) {
+			$this->columns = call_user_func_array($this->columns, [$this->model]);
+		}
+		//$html = Html::beginTag('div', $this->options);
+		
+		return strtr($this->template, [
+			'{header}' => $this->renderHeader(),
+			'{ribbon}' => $this->renderRibbon(),
+			'{detail}' => $this->renderDetail(),
+			'{items}' => $this->render($this->viewFile, ['model' => $this->model]),
+		]);
+        //$html = Html::endTag('div');    
 	}
 
 	protected function getDataCellLabel($model, $attribute) {
@@ -98,17 +117,19 @@ class InvoiceSummary extends Widget {
         return null;
     }
 	
-	protected function getSummaryCellLabel($model, $attribute) {
-		return $this->getDataCellLabel($model, $attribute);
-	}
-	
-	protected function getSummaryCellValue($model, $attribute) {
-		return $this->getDataCellValue($model, $attribute);
+	public function renderRibbon() {
+		$isPaid = $this->getIsPaid();
+		
+		return strtr($this->ribbonTemplate, [
+			'{status}' => \Yii::t('payment', $this->getPaidStatus()),
+			'{color}' => $isPaid ? 'green' : 'red', 
+		]);
 	}
 	
 	public function renderHeader() {
 		return strtr($this->header, [
 			'{title}' => \Yii::t('payment', $this->title),
+			'{ribbon}' => $this->renderRibbon(),
 		]);
 	}
 	
@@ -116,7 +137,7 @@ class InvoiceSummary extends Widget {
 		$column = $this->normalizeColumn($column);
 		if ($column['visible']) {
 			$options = isset($column['headerOptions']) ? $column['headerOptions'] : [];
-			return Html::tag('th', $this->getSummaryCellLabel($model, $column), $options);
+			return Html::tag('th', $this->getDataCellLabel($model, $column), $options);
 		}
 	}
 	
@@ -137,6 +158,15 @@ class InvoiceSummary extends Widget {
 		return $html;
 	}
 	
+	protected function getPaidStatus() {
+		$isPaid = $this->getIsPaid();
+		return Yii::t('payment', $isPaid ? 'Paid' : 'Unpaid');
+	}
+	
+	protected function getIsPaid() {
+		return isset($this->isPaid) ? $this->isPaid : $this->model->isPaid;
+	}
+	
 	protected function normalizeColumn($column) {
 		foreach (['visible'] as $name) {
 			if (!isset($column[$name])) {
@@ -150,7 +180,7 @@ class InvoiceSummary extends Widget {
 		$format = isset($column['format']) ? $column['format'] : 'text';
 		
 		if (is_array($column)) {
-            return $this->formatter->format($this->getSummaryCellValue($model, $column), $format);
+            return $this->formatter->format($this->getDataCellValue($model, $column), $format);
 		}
 		return $model->{$column};
 	}
@@ -167,24 +197,6 @@ class InvoiceSummary extends Widget {
 		return $count;
 	}
 	
-	public function renderSummaryRow($model, $attribute) {
-		$visible = isset($attribute['visible']) ? $attribute['visible'] : true;
-		if (is_callable($visible)) $visible = call_user_func_array($visible, [$model]);
-		
-		$labelOptions = isset($attribute['labelOptions']) ? $attribute['labelOptions'] : ['colspan' => $this->calculateColumn() - 1, 'class' => 'text-right'];
-		$options = isset($attribute['options']) ? $attribute['options'] : ['class' => 'text-right'];
-		
-		$html = '';
-		if ($visible) {
-			$html = Html::beginTag('tr');
-			
-			$html .= Html::tag('td', $this->renderSummaryLabelCellContent($model, $attribute), $labelOptions);
-			$html .= Html::tag('td', $this->renderSummaryValueCellContent($model, $attribute), $options);
-			$html .= Html::endTag('tr');
-		}
-		return $html;
-	}
-	
 	public function renderDetail() {
 		if ($this->detail !== false) {
 			$options = $this->detail;
@@ -193,21 +205,15 @@ class InvoiceSummary extends Widget {
 		}
 	}
 	
-	protected function renderSummaryLabelCellContent($model, $attribute) {
-		$format = isset($attribute['format']) ? $attribute['format'] : 'text';
-		
-		if (is_array($attribute)) {
+	public function renderSummary() {
+		if ($this->summary !== false) {
+			$options = $this->summary;
+			$options['model'] = $this->model;
+			$options['itemsRelation'] = $this->itemsRelation;
+			$options['colspan'] = $this->calculateColumn() - 1;
+			if (isset($this->showSubtotal) && !isset($options['showSubtotal'])) $options['showSubtotal'] = $this->showSubtotal;
+			return BillableSummary::widget($options);
 		}
-		return $this->formatter->format($this->getSummaryCellLabel($model, $attribute), $format);
-	}
-	
-	protected function renderSummaryValueCellContent($model, $attribute) {
-		$format = isset($attribute['format']) ? $attribute['format'] : 'text';
-		
-		if (is_array($attribute)) {
-            return $this->formatter->format($this->getSummaryCellValue($model, $attribute), $format);
-		}
-		return $model->{$attribute};
 	}
 	
 	protected function getFormatter() {

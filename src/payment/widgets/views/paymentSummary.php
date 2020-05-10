@@ -1,6 +1,7 @@
 <?php 
 use yii\helpers\Html;
 use ant\payment\models\Payment;
+use ant\file\models\FileAttachment;
 ?>
 <div class="panel panel-default">
 <div class="panel-heading">Payment Details</div>
@@ -77,7 +78,7 @@ use ant\payment\models\Payment;
                 'value' => function ($model) {
                     $html = '';
                     foreach ($model->attachments as $image) {
-                        $path = $image['base_url'].'/'.$image['path'];
+                        $path = FileAttachment::getFirstUrl($image);
                         $html .= Html::a(Html::img($path, [
                             'height' => '120px',
                         ]), $path);

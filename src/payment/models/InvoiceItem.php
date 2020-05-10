@@ -26,6 +26,7 @@ use ant\payment\models\PayableItem;
 class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 {
 	use \ant\payment\traits\BillableItemTrait;
+	use \ant\discount\traits\Discountable;
 	
     /**
      * @inheritdoc
@@ -63,7 +64,7 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
             [['invoice_id', 'title', 'unit_price'], 'required'],
             [['invoice_id', 'item_id', 'quantity'], 'integer'],
             [['unit_price'], 'number', 'min' => 0],
-            [['created_at', 'updated_at', 'discount_value', 'discount_type'], 'safe'],
+            [['created_at', 'updated_at', 'discount_value', 'discount_amount', 'discount_percent', 'discount_type'], 'safe'],
             [['title', 'description', 'remark'], 'string'],
             [['invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => Invoice::className(), 'targetAttribute' => ['invoice_id' => 'id']],
         ];
@@ -97,7 +98,7 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
     }
 	
 	public function getNetTotal() {
-		return Currency::rounding($this->getDiscountedUnitPrice() * $this->getQuantity());
+		return Currency::rounding($this->getDiscountedUnitPrice() * $this->getQuantity() - $this->additional_discount);
 	}
 	
     public function getSubtotal(){
@@ -132,28 +133,8 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 		return $this->unit_price;
 	}
 	
-	public function getDiscountAmount() {
-		$value = $this->discount_value ? $this->discount_value : 0;
-		$discount = new Discount($value + $this->additional_discount, $this->discount_type);
-		return $discount->of($this->unitPrice);
-	}
-	
 	public function getDiscountedUnitPrice() {
-		return Currency::rounding($this->amount - $this->discountAmount);
-	}
-	
-	public function setDiscount($discount, $discountType = 0) {
-		if ($discount instanceof \ant\discount\helpers\Discount) {
-			$this->discount_value = $discount->value;
-			$this->discount_type = $discount->type;
-		} else {
-			$this->discount_value = $discount;
-			$this->discount_type = $discountType;
-		}
-	}
-	
-	public function getDiscount() {
-		return new \ant\discount\helpers\Discount($this->discount_value, $this->discount_type);
+		return Currency::rounding($this->amount - $this->totalDiscount);
 	}
 	
 	public function deductAvailableQuantity($quantity) {

@@ -131,7 +131,11 @@ class InvoiceItem extends \yii\db\ActiveRecord implements PayableItem
 	
 	public function getUnitPrice() {
 		return $this->unit_price;
-	}
+    }
+    
+    public function getDiscountedAmount() {
+        return $this->getDiscountedUnitPrice() * $this->getQuantity();
+    }
 	
 	public function getDiscountedUnitPrice() {
 		return Currency::rounding($this->amount - $this->totalDiscount);

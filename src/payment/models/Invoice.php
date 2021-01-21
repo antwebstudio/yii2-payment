@@ -399,7 +399,7 @@ class Invoice extends ActiveRecord implements Payable
 	}
 
 	public function getInvoiceItems() {
-		return $this->hasMany(InvoiceItem::className(), ['invoice_id' => 'id']);
+		return $this->hasMany(InvoiceItem::className(), ['invoice_id' => 'id'])->orderBy(['included_in_subtotal' => SORT_DESC]);
 	}
 	
 	public function getBillable() {

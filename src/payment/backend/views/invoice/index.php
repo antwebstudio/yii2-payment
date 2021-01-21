@@ -2,6 +2,8 @@
 use yii\helpers\ArrayHelper;
 use ant\payment\models\Invoice;
 use ant\user\models\User;
+
+$this->title = 'Invoice'.(isset($user) ? ' - '.$user->username : '');
 ?>
 <?php if ($searchModel->userId): ?>
     <?= \ant\widgets\Nav::widget([

@@ -4,6 +4,7 @@ namespace ant\payment\backend\controllers;
 
 use Yii;
 use yii\web\Controller;
+use ant\user\models\User;
 use ant\payment\models\Payment;
 use ant\payment\models\Invoice;
 use ant\payment\models\InvoiceSearch;
@@ -82,13 +83,15 @@ class InvoiceController extends Controller
     }
 	
 	public function actionIndex($user = null) {
+        $user = isset($user) ? User::findOne($user) : null;
 		$model = new InvoiceSearch;
-		$model->userId = $user;
+		$model->userId = $user->id ?? null;
 		$dataProvider = $model->search(\Yii::$app->request->queryParams);
 
 		return $this->render($this->action->id, [
 			'searchModel' => $model,
 			'dataProvider' => $dataProvider,
+			'user' => $user ?? null,
 		]);
 	}
 }

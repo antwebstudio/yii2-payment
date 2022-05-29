@@ -94,4 +94,24 @@ class InvoiceController extends Controller
 			'user' => $user ?? null,
 		]);
 	}
+
+	public function actionRepair($id, $repairType) {
+		$invoice = Invoice::find()->andWhere(['id' => $id])->one();
+		if ($repairType == 'calculated_amount') {
+			$invoice->paid_amount = $invoice->getCalculatedPaidAmount(false);
+			$invoice->save();
+		} else if ($repairType == 'recorded_amount') {
+			if ($invoice->total_amount < $invoice->getCalculatedTotalAmount()) {
+				throw new \Exception('Calculated amount is more than recorded amount, hence it is impossible that calculated amount is wrong. ');
+			}
+			$amountNotStored = $invoice->total_amount - $invoice->getCalculatedTotalAmount();
+			$invoice->status = Invoice::STATUS_PAID_MANUALLY;
+			$invoice->save();
+		} else {
+			throw new \Exception('Unsupported repair type: '.$repairType);
+		}
+        \Yii::$app->session->setFlash('success', 'Invoice successfully repaired. ');
+
+        return $this->redirect(['view', 'id' => $id]);
+	}
 }

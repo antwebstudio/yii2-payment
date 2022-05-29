@@ -296,7 +296,7 @@ class Invoice extends ActiveRecord implements Payable
 		}
 	}
 
-	public function getCalculatedPaidAmount() {
+	public function getCalculatedPaidAmount($throwException = true) {
 		if (!isset($this->_calculatedPaidAmount)) {
 			$paidAmount = 0;
 			$payments = $this->getPayments()->all();
@@ -310,7 +310,7 @@ class Invoice extends ActiveRecord implements Payable
 			}
 			$this->_calculatedPaidAmount = $paidAmount;
 		}
-		if ($this->status != self::STATUS_PAID_MANUALLY && (double) $this->_calculatedPaidAmount != (double) $this->paid_amount) throw new \Exception('Paid amount recorded in database is not correct. (Invoice ID: '.$this->id.', recorded: '.$this->paid_amount.', calculated: '.$this->_calculatedPaidAmount.')');
+		if ($throwException && $this->status != self::STATUS_PAID_MANUALLY && (double) $this->_calculatedPaidAmount != (double) $this->paid_amount) throw new \Exception('Paid amount recorded in database is not correct. (Invoice ID: '.$this->id.', recorded: '.$this->paid_amount.', calculated: '.$this->_calculatedPaidAmount.')');
 
 		return Currency::rounding($this->_calculatedPaidAmount);
 	}
@@ -399,7 +399,7 @@ class Invoice extends ActiveRecord implements Payable
 	}
 
 	public function getInvoiceItems() {
-		return $this->hasMany(InvoiceItem::className(), ['invoice_id' => 'id'])->orderBy(['included_in_subtotal' => SORT_DESC]);
+		return $this->hasMany(InvoiceItem::className(), ['invoice_id' => 'id']);
 	}
 	
 	public function getBillable() {
